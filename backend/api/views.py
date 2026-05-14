@@ -22,8 +22,10 @@ class RegisterView(viewsets.GenericViewSet):
         user = serializer.save()
         # create token
         token, _ = Token.objects.get_or_create(user=user)
-        response = Response({'id': user.id, 'email': user.email}, status=status.HTTP_201_CREATED)
-        response.set_cookie(key='auth_token', value=token.key, httponly=True, samesite='Lax', max_age=86400*30)
+        response = Response(
+            {'id': user.id, 'email': user.email}, status=status.HTTP_201_CREATED)
+        response.set_cookie(key='auth_token', value=token.key,
+                            httponly=True, samesite='Lax', max_age=86400*30)
         return response
 
 
@@ -40,7 +42,8 @@ def login(request):
     token, _ = Token.objects.get_or_create(user=user)
     ser = UserSerializer(user)
     response = Response({'user': ser.data}, status=status.HTTP_200_OK)
-    response.set_cookie(key='auth_token', value=token.key, httponly=True, samesite='Lax', max_age=86400*30)
+    response.set_cookie(key='auth_token', value=token.key,
+                        httponly=True, samesite='Lax', max_age=86400*30)
     return response
 
 
@@ -52,7 +55,8 @@ def logout(request):
         request.auth.delete()
     except Exception:
         pass
-    response = Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
+    response = Response({'message': 'Logout successful'},
+                        status=status.HTTP_200_OK)
     response.delete_cookie(key='auth_token', samesite='Lax')
     return response
 
@@ -89,12 +93,13 @@ class ReportViewSet(viewsets.ModelViewSet):
         report = self.get_object()
         operator_id = request.data.get('operator_id')
         if not operator_id:
-            return Response({'error':'operator_id required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'operator_id required'}, status=status.HTTP_400_BAD_REQUEST)
         report.assigned_operator_id = operator_id
         report.status = 'En atención'
         report.save()
-        AuditLog.objects.create(user=request.user, action='assign_report', target_type='report', target_id=str(report.id), metadata={'operator_id': operator_id})
-        return Response({'status':'assigned','report': ReportSerializer(report).data})
+        AuditLog.objects.create(user=request.user, action='assign_report', target_type='report', target_id=str(
+            report.id), metadata={'operator_id': operator_id})
+        return Response({'status': 'assigned', 'report': ReportSerializer(report).data})
 
     @action(detail=True, methods=['post'], permission_classes=[IsOperatorOrAdmin])
     def change_status(self, request, pk=None):
@@ -102,11 +107,12 @@ class ReportViewSet(viewsets.ModelViewSet):
         new_status = request.data.get('status')
         note = request.data.get('note')
         if not new_status:
-            return Response({'error':'status required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'status required'}, status=status.HTTP_400_BAD_REQUEST)
         report.status = new_status
         report.save()
-        AuditLog.objects.create(user=request.user, action='change_status', target_type='report', target_id=str(report.id), metadata={'status': new_status, 'note': note})
-        return Response({'status':'ok','report': ReportSerializer(report).data})
+        AuditLog.objects.create(user=request.user, action='change_status', target_type='report', target_id=str(
+            report.id), metadata={'status': new_status, 'note': note})
+        return Response({'status': 'ok', 'report': ReportSerializer(report).data})
 
 
 class DocumentViewSet(viewsets.ModelViewSet):
@@ -141,6 +147,15 @@ class DocumentViewSet(viewsets.ModelViewSet):
             pass
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user = getattr(self.request, 'user', None)
+        if user and getattr(user, 'role', '') == 'citizen':
+            qs = qs.filter(user=user)
+            return qs
+        else:
+            return None
 
 
 class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
