@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>H2O Chimal - Bienvenido</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error-container": "#ffdad6",
+                      "outline-variant": "#c2c6d4",
+                      "on-primary": "#ffffff",
+                      "background": "#f8f9ff",
+                      "on-surface-variant": "#424752",
+                      "surface-bright": "#f8f9ff",
+                      "error": "#ba1a1a",
+                      "tertiary": "#004953",
+                      "on-tertiary-container": "#51e1fa",
+                      "on-secondary-fixed": "#001e2d",
+                      "on-primary-fixed-variant": "#004491",
+                      "secondary": "#00658d",
+                      "on-background": "#0b1c30",
+                      "surface-tint": "#115cb9",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed-dim": "#acc7ff",
+                      "surface-container": "#e5eeff",
+                      "tertiary-fixed-dim": "#44d8f1",
+                      "tertiary-container": "#00626f",
+                      "secondary-fixed": "#c6e7ff",
+                      "surface-container-highest": "#d3e4fe",
+                      "on-secondary-fixed-variant": "#004c6b",
+                      "tertiary-fixed": "#a1efff",
+                      "surface-dim": "#cbdbf5",
+                      "inverse-on-surface": "#eaf1ff",
+                      "surface-container-low": "#eff4ff",
+                      "outline": "#727784",
+                      "primary-container": "#0056b3",
+                      "secondary-container": "#2dbcfe",
+                      "inverse-surface": "#213145",
+                      "surface-variant": "#d3e4fe",
+                      "inverse-primary": "#acc7ff",
+                      "on-primary-fixed": "#001a40",
+                      "on-primary-container": "#bbd0ff",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container-high": "#dce9ff",
+                      "on-surface": "#0b1c30",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-fixed-variant": "#004e59",
+                      "on-tertiary-fixed": "#001f25",
+                      "secondary-fixed-dim": "#82cfff",
+                      "primary": "#003f87",
+                      "on-error": "#ffffff",
+                      "surface": "#f8f9ff",
+                      "on-tertiary": "#ffffff",
+                      "primary-fixed": "#d7e2ff",
+                      "on-secondary-container": "#004866"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-lg": "40px",
+                      "stack-md": "24px",
+                      "container-margin": "20px",
+                      "base": "8px",
+                      "stack-sm": "12px",
+                      "gutter": "16px"
+              },
+              "fontFamily": {
+                      "h1": [
+                              "Public Sans"
+                      ],
+                      "h3": [
+                              "Public Sans"
+                      ],
+                      "h2": [
+                              "Public Sans"
+                      ],
+                      "body-lg": [
+                              "Public Sans"
+                      ],
+                      "body-md": [
+                              "Public Sans"
+                      ],
+                      "label-sm": [
+                              "Public Sans"
+                      ],
+                      "label-xs": [
+                              "Public Sans"
+                      ]
+              },
+              "fontSize": {
+                      "h1": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "h3": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "h2": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-xs": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-bright text-on-surface antialiased min-h-screen flex flex-col relative overflow-hidden font-body-md">
+<!-- Subdued water motif background -->
+<div class="absolute inset-0 z-0 bg-cover bg-center opacity-40 mix-blend-multiply" data-alt="A highly subtle, minimalist abstract background design representing clean water. The image features soft, flowing light blue and white textures that mimic gentle ripples on a calm water surface. The aesthetic is extremely bright, corporate, and modern, perfectly suited for a light-mode user interface backdrop. The lighting is diffused and even, with no harsh shadows, ensuring that superimposed text and UI elements will remain perfectly legible. The overall mood conveys purity, transparency, and institutional reliability." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDhb-maOAiAMQcSyb_YyD21rgjm48zaLVFfvFb3Y843blu-ZFx34D2LNJodp18VhNhOeRr3DdJ4MdXSFYlEFSoj7pSJQoljCjT4LX6q1EfDubHT6T5aWHuTw1NxMatob8DMacTmWDHfD1xgFLbD-dDE-pK51bgfrfk-RXtSYtBOm3Wl0p6cdD3-0lZ7w9MDJZr0itps-BItzVWSxG8Dcu9B5NG5cKoHBKvooTu8brWMHfxKY8b4wNpMKUundqcJIEKvQ1JCSlPJqQ');">
+</div>
+<!-- Gradient overlay to ensure text readability -->
+<div class="absolute inset-0 z-0 bg-gradient-to-b from-surface-bright/80 via-surface-bright/95 to-surface-bright"></div>
+<!-- Main Content Container -->
+<main class="relative z-10 flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto px-container-margin py-stack-lg">
+<!-- Logo Cluster -->
+<div class="flex flex-col items-center mb-stack-lg transform transition-transform duration-500 hover:scale-105">
+<div class="bg-surface-container rounded-full p-4 mb-stack-sm shadow-[0_4px_20px_rgba(0,63,135,0.08)]">
+<span class="material-symbols-outlined text-primary text-[64px]" data-icon="water_drop" data-weight="fill">
+                    water_drop
+                </span>
+</div>
+<h1 class="font-h1 text-h1 text-primary tracking-tight text-center">
+                H2O Chimal
+            </h1>
+<p class="font-body-md text-body-md text-on-surface-variant text-center mt-base max-w-[280px]">
+                Gestión municipal de reportes y servicios de agua potable.
+            </p>
+</div>
+<!-- Action Buttons -->
+<div class="w-full flex flex-col gap-stack-md mt-stack-lg">
+<button class="w-full flex items-center justify-center bg-primary text-on-primary font-label-sm text-label-sm py-4 rounded-lg shadow-[0_8px_16px_-4px_rgba(0,63,135,0.2)] hover:bg-primary-container transition-all duration-200 active:scale-[0.98]">
+                Iniciar Sesión
+            </button>
+<button class="w-full flex items-center justify-center bg-transparent border-2 border-outline-variant text-primary font-label-sm text-label-sm py-4 rounded-lg hover:border-primary hover:bg-surface-container-low transition-all duration-200 active:scale-[0.98]">
+                Registrarse
+            </button>
+</div>
+</main>
+</body></html>

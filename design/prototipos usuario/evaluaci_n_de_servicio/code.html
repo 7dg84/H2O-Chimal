@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline": "#727784",
+                    "on-background": "#0b1c30",
+                    "on-surface-variant": "#424752",
+                    "on-secondary-container": "#004866",
+                    "primary-container": "#0056b3",
+                    "on-surface": "#0b1c30",
+                    "inverse-primary": "#acc7ff",
+                    "secondary-fixed-dim": "#82cfff",
+                    "tertiary-fixed": "#a1efff",
+                    "on-tertiary-fixed": "#001f25",
+                    "secondary": "#00658d",
+                    "inverse-on-surface": "#eaf1ff",
+                    "tertiary-container": "#00626f",
+                    "on-secondary-fixed-variant": "#004c6b",
+                    "surface-dim": "#cbdbf5",
+                    "surface-container-highest": "#d3e4fe",
+                    "surface-variant": "#d3e4fe",
+                    "on-primary-fixed-variant": "#004491",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-container": "#bbd0ff",
+                    "secondary-fixed": "#c6e7ff",
+                    "on-primary-fixed": "#001a40",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed-dim": "#acc7ff",
+                    "tertiary": "#004953",
+                    "surface-bright": "#f8f9ff",
+                    "error": "#ba1a1a",
+                    "primary-fixed": "#d7e2ff",
+                    "inverse-surface": "#213145",
+                    "surface-tint": "#115cb9",
+                    "on-secondary": "#ffffff",
+                    "background": "#f8f9ff",
+                    "surface-container-high": "#dce9ff",
+                    "secondary-container": "#2dbcfe",
+                    "surface-container-low": "#eff4ff",
+                    "outline-variant": "#c2c6d4",
+                    "surface-container": "#e5eeff",
+                    "primary": "#003f87",
+                    "on-secondary-fixed": "#001e2d",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed-variant": "#004e59",
+                    "surface": "#f8f9ff",
+                    "on-primary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed-dim": "#44d8f1",
+                    "on-tertiary-container": "#51e1fa",
+                    "on-error": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "container-margin": "20px",
+                    "base": "8px",
+                    "stack-sm": "12px",
+                    "stack-md": "24px",
+                    "stack-lg": "40px"
+            },
+            "fontFamily": {
+                    "body-md": ["Public Sans"],
+                    "body-lg": ["Public Sans"],
+                    "h3": ["Public Sans"],
+                    "h2": ["Public Sans"],
+                    "label-sm": ["Public Sans"],
+                    "label-xs": ["Public Sans"],
+                    "h1": ["Public Sans"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "h3": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "h2": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-sm": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "label-xs": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "h1": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Public Sans', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="flex items-center justify-between px-container-margin w-full h-16 bg-surface dark:bg-on-background border-b border-outline-variant dark:border-outline fixed top-0 z-50">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" data-icon="water_drop">water_drop</span>
+<h1 class="font-h2 text-h2 text-primary dark:text-primary-fixed-dim font-bold">H2O Chimal</h1>
+</div>
+<div class="flex items-center">
+<button class="p-2 transition-colors duration-200 hover:bg-surface-container dark:hover:bg-surface-variant rounded-full">
+<span class="material-symbols-outlined text-on-surface-variant dark:text-outline-variant" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-16 pb-24 px-container-margin max-w-lg mx-auto w-full">
+<!-- Success Header -->
+<div class="mt-stack-lg text-center">
+<div class="inline-flex items-center justify-center w-20 h-20 bg-secondary-container text-on-secondary-container rounded-full mb-stack-sm">
+<span class="material-symbols-outlined text-5xl" data-icon="check_circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h2 class="font-h1 text-h1 text-primary mb-2">¡Reporte Resuelto!</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Tu reporte con folio <span class="font-bold text-on-surface">#F-24081</span> ha sido atendido con éxito. Por favor, califica el servicio recibido para ayudarnos a mejorar.
+            </p>
+</div>
+<!-- Report Summary Card -->
+<section class="mt-stack-md bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm flex">
+<div class="w-3 bg-[#10b981]"></div> <!-- Semantic Success Green Strip -->
+<div class="p-4 flex gap-4 w-full">
+<div class="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container">
+<img alt="Leak report image" class="w-full h-full object-cover" data-alt="A detailed close-up of a repaired water pipe junction on a sunlit urban sidewalk. The new professional fittings are visible, showing high-quality technical proficiency. The lighting is bright and clear, reflecting a modern light-mode aesthetic with clean textures and a sense of professional municipal maintenance in an orderly street environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcFePIwTuWer7iPfpriV19kPmwnRfVeScflrLJz3OlYgAwv8I-MbZdu9H_WciRSWBEDC9_CGFCEI7H4k621lChizg8iil-dxgIaJmLKzgeJb8Xua9-FkUok09Ua_3Tl5zHSud2WqoOF8cQp04sYjfuBnyf66ioCFl34pxrHbwXRCX5XD3A_2lam4nUpOD5t37VjMRd5KgZNbGshPWDgRDD7lUKVp-Xd4v62-gP9GVwsht4aob__FP48orABaXcFlrwdmKMayY11g"/>
+</div>
+<div class="flex flex-col justify-center">
+<span class="font-label-xs text-label-xs text-[#10b981] font-bold uppercase tracking-wider mb-1">Completado</span>
+<h3 class="font-h3 text-h3 text-on-surface">Fuga de agua potable</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span>
+                        Av. del Peñón, Chimalhuacán
+                    </p>
+<p class="font-label-xs text-label-xs text-outline mt-1">24 Ago 2024 • 14:30 hrs</p>
+</div>
+</div>
+</section>
+<!-- Evaluation Section -->
+<section class="mt-stack-lg">
+<div class="flex flex-col items-center gap-base">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Calidad de la reparación</label>
+<div class="flex justify-center gap-2">
+<button class="text-secondary-container hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-5xl" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</button>
+<button class="text-secondary-container hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-5xl" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</button>
+<button class="text-secondary-container hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-5xl" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</button>
+<button class="text-secondary-container hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-5xl" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</button>
+<button class="text-secondary-container hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-5xl" data-icon="star">star</span>
+</button>
+</div>
+</div>
+<!-- Comments Area -->
+<div class="mt-stack-md">
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant px-1" for="comments">Comentarios adicionales (opcional)</label>
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-3 text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-outline-variant" id="comments" placeholder="Escribe aquí tu experiencia con el servicio..." rows="4"></textarea>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="mt-stack-lg flex flex-col gap-3">
+<button class="w-full bg-primary text-on-primary font-label-sm text-label-sm py-4 rounded-xl shadow-sm active:scale-[0.98] transition-transform duration-150 flex items-center justify-center gap-2">
+                    Enviar Evaluación
+                    <span class="material-symbols-outlined text-[20px]" data-icon="send">send</span>
+</button>
+<button class="w-full bg-transparent text-primary font-label-sm text-label-sm py-3 rounded-xl border border-transparent hover:bg-surface-container transition-colors duration-200">
+                    Omitir por ahora
+                </button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center h-20 px-4 pb-safe bg-surface-container dark:bg-on-background border-t border-outline-variant dark:border-outline shadow-sm rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary dark:hover:text-primary-fixed-dim active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-xs text-label-xs">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary dark:hover:text-primary-fixed-dim active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span class="font-label-xs text-label-xs">Mapa</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary dark:hover:text-primary-fixed-dim active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="plumbing">plumbing</span>
+<span class="font-label-xs text-label-xs">Servicios</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary dark:hover:text-primary-fixed-dim active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-xs text-label-xs">Usuario</span>
+</a>
+</nav>
+</body></html>

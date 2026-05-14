@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>H2O Chimal - Mapa Interactivo</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#001f25",
+                    "on-error": "#ffffff",
+                    "primary": "#003f87",
+                    "background": "#f8f9ff",
+                    "secondary-fixed-dim": "#82cfff",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed": "#a1efff",
+                    "surface-dim": "#cbdbf5",
+                    "on-primary-fixed": "#001a40",
+                    "on-secondary-fixed": "#001e2d",
+                    "secondary": "#00658d",
+                    "primary-fixed": "#d7e2ff",
+                    "surface-container-highest": "#d3e4fe",
+                    "tertiary-fixed-dim": "#44d8f1",
+                    "on-error-container": "#93000a",
+                    "tertiary": "#004953",
+                    "surface-tint": "#115cb9",
+                    "on-secondary-fixed-variant": "#004c6b",
+                    "primary-container": "#0056b3",
+                    "on-primary-container": "#bbd0ff",
+                    "surface-bright": "#f8f9ff",
+                    "secondary-container": "#2dbcfe",
+                    "on-tertiary-container": "#51e1fa",
+                    "inverse-primary": "#acc7ff",
+                    "on-surface-variant": "#424752",
+                    "surface": "#f8f9ff",
+                    "on-tertiary": "#ffffff",
+                    "secondary-fixed": "#c6e7ff",
+                    "on-primary-fixed-variant": "#004491",
+                    "surface-container-high": "#dce9ff",
+                    "on-background": "#0b1c30",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#eff4ff",
+                    "on-secondary-container": "#004866",
+                    "surface-container": "#e5eeff",
+                    "inverse-surface": "#213145",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed-dim": "#acc7ff",
+                    "outline": "#727784",
+                    "surface-container-lowest": "#ffffff",
+                    "on-surface": "#0b1c30",
+                    "error-container": "#ffdad6",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-tertiary-fixed-variant": "#004e59",
+                    "surface-variant": "#d3e4fe",
+                    "outline-variant": "#c2c6d4",
+                    "tertiary-container": "#00626f"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "8px",
+                    "container-margin": "20px",
+                    "stack-md": "24px",
+                    "stack-sm": "12px",
+                    "gutter": "16px",
+                    "stack-lg": "40px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Public Sans"],
+                    "label-xs": ["Public Sans"],
+                    "label-sm": ["Public Sans"],
+                    "h3": ["Public Sans"],
+                    "body-md": ["Public Sans"],
+                    "h1": ["Public Sans"],
+                    "h2": ["Public Sans"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-xs": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "label-sm": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "h3": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "h1": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "h2": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .map-container {
+            height: calc(100vh - 64px - 64px);
+        }
+        .glass-overlay {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant flex justify-between items-center px-container-margin h-16 w-full max-w-md mx-auto left-1/2 -translate-x-1/2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary font-h2 text-h2">water_drop</span>
+<h2 class="font-h2 text-h2 text-primary">H2O Chimal</h2>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant bg-surface-container-high">
+<img alt="User profile photo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3RiUuyA0zNnqOC3cFbRXdUYq3uoQbjhhyQw2v5NHVrTj3nJI88G31fzGHVFW_DmKGwZjypV4FHtUZ-vMTgJSCXyStqEm8Z2gZaQEXY8-owYO7psRPrabTRRpGA3afg_uHk_JV94KeULDtvmrWcLIJidjcnF9DWdJ9d3WAA4CPSqmAmgCLpneCQMwUgtXL39OzbCaKqnBVcX0qSrL9nNBwADZANb2fZ0jsWTVKOJhOHYnfr6O73gTe1gkSWpSYzper7RbXd_Bmig"/>
+</div>
+</header>
+<!-- Main Content: Full Screen Map -->
+<main class="mt-16 relative w-full h-screen max-w-md mx-auto bg-surface-container overflow-hidden">
+<!-- Interactive Map Element -->
+<div class="absolute inset-0 z-0">
+<div class="w-full h-full bg-cover bg-center" data-alt="A detailed topographic and urban street map of a Mexican municipality, stylized with professional desaturated blue and grey tones. The map features multiple vibrant interactive markers in red, yellow, and green scattered across the grid. The lighting is clean and flat, emphasizing the corporate modern aesthetic of a utility service dashboard. The overall atmosphere is technical, organized, and provides a clear overview of urban infrastructure." data-location="Chimalhuacan, Mexico" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCWQCvdXYDgHJZq3RfNcjcR1_TEFTbSSqQ387W-iCdRplOeRu-Jqk-_T3Ep2iju2RJuEMKcGfmWlQ6igjLulYlu6yWHCZu6KZ0LkRbOWPTDGDvv7wjEBJxi65mSXd9l79vbufgcpRwgo0IgHKLx7X6FXDbTKG9UCebmTuaMZQVxEaN3-PcyR5rOV9xUfKTB0TL9IE2768bBvKQMVVQCUBd9S_4G1Y0juxvC2NZeldud-PbV10Uu5xmp5pbniAkCBf4-FOjsGRguZw");'><!-- Map Markers (Simulated) -->
+<div class="absolute top-1/4 left-1/3 group cursor-pointer">
+<span class="material-symbols-outlined text-error text-[32px] drop-shadow-md" style='font-variation-settings: "FILL" 1;'>location_on</span>
+<div class="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 glass-overlay p-2 rounded-lg border border-outline-variant shadow-lg w-40">
+<p class="font-label-sm text-on-surface">Fuga Crítica</p>
+<p class="text-[10px] text-outline font-bold">Folio: #2024-089</p>
+<p class="text-[10px] text-outline">Calle 5 de Mayo</p>
+</div>
+</div>
+<div class="absolute top-1/2 right-1/4 group cursor-pointer">
+<span class="material-symbols-outlined text-secondary text-[32px] drop-shadow-md" style='font-variation-settings: "FILL" 1;'>location_on</span>
+<div class="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 glass-overlay p-2 rounded-lg border border-outline-variant shadow-lg w-40">
+<p class="font-label-sm text-on-surface text-secondary">En Proceso</p>
+<p class="text-[10px] text-outline font-bold">Folio: #2024-075</p>
+<p class="text-[10px] text-outline">Av. Morelos</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Filter Overlay (Floating) -->
+<!-- Legend Overlay (Floating Bottom Left) -->
+<div class="absolute bottom-24 left-4 z-10 glass-overlay p-3 rounded-xl border border-outline-variant shadow-lg flex flex-col gap-2"><div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-error"></span>
+<span class="font-label-xs text-on-surface-variant text-[10px]">Crítico / Sin Atender</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-secondary"></span>
+<span class="font-label-xs text-on-surface-variant text-[10px]">En Proceso</span>
+</div>
+</div>
+<!-- FAB: Floating Action Button (Top-level destination logic applied) -->
+<button class="fixed bottom-[164px] right-4 z-20 w-12 h-12 bg-surface glass-overlay text-primary rounded-full shadow-md flex items-center justify-center hover:bg-surface-container-high transition-all active:scale-90 border border-outline-variant">
+<span class="material-symbols-outlined text-[24px]">my_location</span>
+</button><button class="fixed bottom-24 right-4 z-20 w-14 h-14 bg-primary-container text-on-primary-container rounded-2xl shadow-lg flex items-center justify-center hover:bg-primary transition-all active:scale-90 group">
+<span class="material-symbols-outlined text-[28px]">add_location_alt</span>
+<span class="absolute right-full mr-2 opacity-0 group-hover:opacity-100 transition-opacity bg-inverse-surface text-inverse-on-surface px-3 py-1 rounded-lg text-label-sm whitespace-nowrap" innerhtml="Nuevo Reporte">Reportar Fuga</span>
+</button><div class="fixed bottom-20 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-40px)] max-w-[360px] bg-primary text-on-primary p-3 rounded-xl shadow-xl flex items-center justify-between animate-bounce">
+<p class="font-label-sm">Reportar en esta ubicación</p>
+<button class="bg-on-primary text-primary px-4 py-1 rounded-lg font-label-sm active:scale-95 transition-transform">Iniciar Reporte</button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest border-t border-outline-variant shadow-md max-w-md mx-auto left-1/2 -translate-x-1/2 h-16 flex justify-around items-center px-base py-2 pb-safe"><!-- Home -->
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all px-4 py-1 cursor-pointer scale-95 active:scale-90">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</div>
+<!-- Mapa (ACTIVE STATE) -->
+<div class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 cursor-pointer scale-95 active:scale-90">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">map</span>
+<span class="font-label-sm text-label-sm font-bold">Mapa</span>
+</div>
+<!-- Servicios -->
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all px-4 py-1 cursor-pointer scale-95 active:scale-90">
+<span class="material-symbols-outlined">plumbing</span>
+<span class="font-label-sm text-label-sm">Servicios</span>
+</div>
+<!-- Usuario -->
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all px-4 py-1 cursor-pointer scale-95 active:scale-90">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">Usuario</span>
+</div></nav>
+</body></html>

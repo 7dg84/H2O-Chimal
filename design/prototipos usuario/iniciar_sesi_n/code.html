@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>H2O Chimal - Iniciar Sesión</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error-container": "#ffdad6",
+                      "outline-variant": "#c2c6d4",
+                      "on-primary": "#ffffff",
+                      "background": "#f8f9ff",
+                      "on-surface-variant": "#424752",
+                      "surface-bright": "#f8f9ff",
+                      "error": "#ba1a1a",
+                      "tertiary": "#004953",
+                      "on-tertiary-container": "#51e1fa",
+                      "on-secondary-fixed": "#001e2d",
+                      "on-primary-fixed-variant": "#004491",
+                      "secondary": "#00658d",
+                      "on-background": "#0b1c30",
+                      "surface-tint": "#115cb9",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed-dim": "#acc7ff",
+                      "surface-container": "#e5eeff",
+                      "tertiary-fixed-dim": "#44d8f1",
+                      "tertiary-container": "#00626f",
+                      "secondary-fixed": "#c6e7ff",
+                      "surface-container-highest": "#d3e4fe",
+                      "on-secondary-fixed-variant": "#004c6b",
+                      "tertiary-fixed": "#a1efff",
+                      "surface-dim": "#cbdbf5",
+                      "inverse-on-surface": "#eaf1ff",
+                      "surface-container-low": "#eff4ff",
+                      "outline": "#727784",
+                      "primary-container": "#0056b3",
+                      "secondary-container": "#2dbcfe",
+                      "inverse-surface": "#213145",
+                      "surface-variant": "#d3e4fe",
+                      "inverse-primary": "#acc7ff",
+                      "on-primary-fixed": "#001a40",
+                      "on-primary-container": "#bbd0ff",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container-high": "#dce9ff",
+                      "on-surface": "#0b1c30",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-fixed-variant": "#004e59",
+                      "on-tertiary-fixed": "#001f25",
+                      "secondary-fixed-dim": "#82cfff",
+                      "primary": "#003f87",
+                      "on-error": "#ffffff",
+                      "surface": "#f8f9ff",
+                      "on-tertiary": "#ffffff",
+                      "primary-fixed": "#d7e2ff",
+                      "on-secondary-container": "#004866"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-lg": "40px",
+                      "stack-md": "24px",
+                      "container-margin": "20px",
+                      "base": "8px",
+                      "stack-sm": "12px",
+                      "gutter": "16px"
+              },
+              "fontFamily": {
+                      "h1": [
+                              "Public Sans"
+                      ],
+                      "h3": [
+                              "Public Sans"
+                      ],
+                      "h2": [
+                              "Public Sans"
+                      ],
+                      "body-lg": [
+                              "Public Sans"
+                      ],
+                      "body-md": [
+                              "Public Sans"
+                      ],
+                      "label-sm": [
+                              "Public Sans"
+                      ],
+                      "label-xs": [
+                              "Public Sans"
+                      ]
+              },
+              "fontSize": {
+                      "h1": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "h3": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "h2": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-xs": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom subtle ambient shadow for primary actions based on brand rules */
+        .shadow-ambient-primary {
+            box-shadow: 0 4px 14px 0 rgba(0, 63, 135, 0.15);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col md:flex-row antialiased">
+<!-- Asymmetric Layout: Left Side Brand Visual (Hidden on smaller screens) -->
+<div class="hidden md:flex md:w-[45%] lg:w-[55%] relative bg-surface-container items-center justify-center overflow-hidden">
+<!-- Background Image with highly detailed prompt -->
+<div class="absolute inset-0 bg-cover bg-center opacity-70" data-alt="A striking, high-quality photograph of modern municipal water infrastructure under a clear, bright sky. The scene features clean geometric lines of concrete reservoirs and steel pipes, reflecting a corporate, institutional aesthetic. The lighting is high-key and optimistic, emphasizing reliability and technical proficiency. The color palette is dominated by deep institutional blues, cool grays, and bright whites, perfectly aligning with a modern civic utility design system." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCHq11KewcOxTzfgrkLm3PDfVyBdSkKUXhBdsRKdn3sTKLB5y-tWpTPBLjfmf-GR9AAlkWMGCbKm8QVHKY4G9qqFGK19apGVXJKAaMZfoq3r9BMBFLmb1IE3kWJhhzTrficI3aDV8bC1E7CV4PXy8xXm2kDztrD26BAL61jTks1NloFwsfMmrtnXfoah9PGiPDN-upIeLEa6yJKS3ObqEtcpBP93P_wxPwy3sX9_5mKei3GNVi7v2QmOj6LzfBBir_YuPT6hMJ-QA');">
+</div>
+<!-- Gradient overlay for readability and brand color integration -->
+<div class="absolute inset-0 bg-gradient-to-tr from-primary/90 via-primary/60 to-transparent"></div>
+<!-- Brand Identity Canvas -->
+<div class="relative z-10 p-stack-lg flex flex-col items-start text-left max-w-lg mx-auto w-full">
+<div class="bg-surface-container-lowest/20 p-4 rounded-xl backdrop-blur-sm border border-on-primary/20 mb-stack-md inline-flex">
+<span class="material-symbols-outlined text-[48px] text-on-primary" style="font-variation-settings: 'FILL' 1;">water_drop</span>
+</div>
+<h1 class="font-h1 text-h1 text-on-primary mb-base drop-shadow-sm">H2O Chimal</h1>
+<p class="font-body-lg text-body-lg text-on-primary/90 max-w-md">
+                 Portal de Servicios Municipales. Gestionando la eficiencia y transparencia en la red hídrica de nuestra comunidad.
+             </p>
+</div>
+</div>
+<!-- Right Side: Interaction Canvas (Login Form) -->
+<div class="w-full md:w-[55%] lg:w-[45%] min-h-screen flex items-center justify-center p-container-margin bg-background">
+<main class="w-full max-w-[400px] flex flex-col">
+<!-- Mobile Brand Header (Visible only when left panel is hidden) -->
+<div class="flex flex-col items-center justify-center gap-base text-center mb-stack-lg md:hidden">
+<span class="material-symbols-outlined text-5xl text-primary" style="font-variation-settings: 'FILL' 1;">water_drop</span>
+<h1 class="font-h1 text-h1 text-primary">H2O Chimal</h1>
+</div>
+<!-- Login Container Card (Surface 2 with subtle border) -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-stack-md sm:p-stack-lg flex flex-col gap-stack-md shadow-sm">
+<div class="flex flex-col gap-base">
+<h2 class="font-h2 text-h2 text-on-surface">Iniciar Sesión</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Ingresa tus credenciales para acceder al sistema de gestión.</p>
+</div>
+<form action="#" class="flex flex-col gap-stack-md mt-base" method="POST">
+<!-- Email Field Container -->
+<div class="flex flex-col gap-stack-sm">
+<label class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-2" for="email">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+                            Correo Electrónico
+                        </label>
+<input class="w-full h-12 px-4 rounded-lg border border-outline-variant bg-surface text-on-surface placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all duration-200" id="email" name="email" placeholder="usuario@municipio.gob" required="" type="email"/>
+</div>
+<!-- Password Field Container -->
+<div class="flex flex-col gap-stack-sm">
+<div class="flex justify-between items-center">
+<label class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-2" for="password">
+<span class="material-symbols-outlined text-[18px]">lock</span>
+                                Contraseña
+                            </label>
+<a class="font-label-sm text-label-sm text-secondary hover:text-primary transition-colors focus:outline-none focus:underline" href="#">
+                                Olvidé mi contraseña
+                            </a>
+</div>
+<div class="relative">
+<input class="w-full h-12 px-4 rounded-lg border border-outline-variant bg-surface text-on-surface placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all duration-200" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<!-- Primary Action Button (Deep Institutional Blue with Ambient Shadow) -->
+<button class="mt-stack-sm w-full h-12 bg-primary text-on-primary rounded-lg font-label-sm text-label-sm flex items-center justify-center gap-2 shadow-ambient-primary hover:bg-primary-container hover:text-on-primary-container active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background" type="submit">
+                        Iniciar Sesión
+                        <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</form>
+</div>
+<!-- Support Footer -->
+<div class="mt-stack-md text-center">
+<p class="font-label-sm text-label-sm text-on-surface-variant">
+                    ¿Problemas para acceder? <a class="text-primary hover:underline" href="#">Contactar a soporte técnico</a>
+</p>
+</div>
+</main>
+</div>
+</body></html>

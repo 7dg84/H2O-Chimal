@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reportar Fuga</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error-container": "#ffdad6",
+                      "outline-variant": "#c2c6d4",
+                      "on-primary": "#ffffff",
+                      "background": "#f8f9ff",
+                      "on-surface-variant": "#424752",
+                      "surface-bright": "#f8f9ff",
+                      "error": "#ba1a1a",
+                      "tertiary": "#004953",
+                      "on-tertiary-container": "#51e1fa",
+                      "on-secondary-fixed": "#001e2d",
+                      "on-primary-fixed-variant": "#004491",
+                      "secondary": "#00658d",
+                      "on-background": "#0b1c30",
+                      "surface-tint": "#115cb9",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed-dim": "#acc7ff",
+                      "surface-container": "#e5eeff",
+                      "tertiary-fixed-dim": "#44d8f1",
+                      "tertiary-container": "#00626f",
+                      "secondary-fixed": "#c6e7ff",
+                      "surface-container-highest": "#d3e4fe",
+                      "on-secondary-fixed-variant": "#004c6b",
+                      "tertiary-fixed": "#a1efff",
+                      "surface-dim": "#cbdbf5",
+                      "inverse-on-surface": "#eaf1ff",
+                      "surface-container-low": "#eff4ff",
+                      "outline": "#727784",
+                      "primary-container": "#0056b3",
+                      "secondary-container": "#2dbcfe",
+                      "inverse-surface": "#213145",
+                      "surface-variant": "#d3e4fe",
+                      "inverse-primary": "#acc7ff",
+                      "on-primary-fixed": "#001a40",
+                      "on-primary-container": "#bbd0ff",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container-high": "#dce9ff",
+                      "on-surface": "#0b1c30",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-fixed-variant": "#004e59",
+                      "on-tertiary-fixed": "#001f25",
+                      "secondary-fixed-dim": "#82cfff",
+                      "primary": "#003f87",
+                      "on-error": "#ffffff",
+                      "surface": "#f8f9ff",
+                      "on-tertiary": "#ffffff",
+                      "primary-fixed": "#d7e2ff",
+                      "on-secondary-container": "#004866"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-lg": "40px",
+                      "stack-md": "24px",
+                      "container-margin": "20px",
+                      "base": "8px",
+                      "stack-sm": "12px",
+                      "gutter": "16px"
+              },
+              "fontFamily": {
+                      "h1": [
+                              "Public Sans"
+                      ],
+                      "h3": [
+                              "Public Sans"
+                      ],
+                      "h2": [
+                              "Public Sans"
+                      ],
+                      "body-lg": [
+                              "Public Sans"
+                      ],
+                      "body-md": [
+                              "Public Sans"
+                      ],
+                      "label-sm": [
+                              "Public Sans"
+                      ],
+                      "label-xs": [
+                              "Public Sans"
+                      ]
+              },
+              "fontSize": {
+                      "h1": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "h3": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "h2": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-xs": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-on-background text-primary dark:text-primary-fixed-dim font-h2 text-h2 font-bold docked full-width top-0 border-b border-outline-variant dark:border-outline flat no shadows hover:bg-surface-container dark:hover:bg-surface-variant transition-colors duration-200 flex items-center justify-between px-container-margin w-full h-16 sticky z-40">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="water_drop">water_drop</span>
+<span>H2O Chimal</span>
+</div>
+<button class="p-2 rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant dark:text-outline-variant">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow px-container-margin py-stack-md pb-[100px] md:pb-stack-md flex flex-col gap-stack-lg max-w-3xl mx-auto w-full">
+<!-- Progress Stepper -->
+<div class="flex items-center justify-between w-full max-w-md mx-auto">
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-sm">1</div>
+<span class="font-label-xs text-primary">Datos</span>
+</div>
+<div class="h-1 flex-grow bg-primary mx-2 rounded-full"></div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full border-2 border-primary text-primary bg-surface flex items-center justify-center font-label-sm">2</div>
+<span class="font-label-xs text-primary font-bold">Reporte</span>
+</div>
+<div class="h-1 flex-grow bg-outline-variant mx-2 rounded-full"></div>
+<div class="flex flex-col items-center gap-2 opacity-50">
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant text-outline-variant bg-surface flex items-center justify-center font-label-sm">3</div>
+<span class="font-label-xs text-outline-variant">Listo</span>
+</div>
+</div>
+<div>
+<h1 class="font-h1 text-h1 text-on-background mb-2">Reportar Fuga</h1>
+<p class="font-body-md text-on-surface-variant">Por favor, completa los detalles a continuación para enviar tu reporte.</p>
+</div>
+<form class="flex flex-col gap-stack-md bg-surface-container-lowest p-stack-md rounded-xl border border-outline-variant shadow-sm relative overflow-hidden">
+<!-- Top highlight strip for forms -->
+<div class="absolute top-0 left-0 right-0 h-1 bg-primary"></div>
+<!-- Sección 1: Datos del usuario (auto-rellenados) -->
+<section class="flex flex-col gap-stack-sm opacity-70 pointer-events-none">
+<h2 class="font-h3 text-h3 text-primary border-b border-outline-variant pb-2 mb-2">Datos del Usuario</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-sm">
+<div class="flex flex-col">
+<label class="font-label-sm text-on-surface-variant mb-1">Nombre</label>
+<input class="bg-surface-variant text-on-surface-variant border-outline-variant rounded-lg px-3 py-2 font-body-md w-full border" disabled="" type="text" value="Juan Pérez"/>
+</div>
+<div class="flex flex-col">
+<label class="font-label-sm text-on-surface-variant mb-1">Teléfono</label>
+<input class="bg-surface-variant text-on-surface-variant border-outline-variant rounded-lg px-3 py-2 font-body-md w-full border" disabled="" type="tel" value="555-123-4567"/>
+</div>
+</div>
+</section>
+<!-- Sección 2: Captura de reporte -->
+<section class="flex flex-col gap-stack-md mt-4">
+<h2 class="font-h3 text-h3 text-primary border-b border-outline-variant pb-2 mb-2">Detalles del Reporte</h2>
+<div class="flex flex-col gap-stack-sm">
+<label class="font-label-sm text-on-surface-variant mb-1">Ubicación de la fuga</label>
+<div class="relative w-full h-48 bg-surface-variant rounded-xl border border-outline-variant overflow-hidden flex items-center justify-center cursor-pointer hover:border-primary transition-colors">
+<img class="w-full h-full object-cover filter grayscale opacity-80" data-alt="A stylized map interface showing a street layout. The map is in a light gray color palette with subtle roads. A bright blue map pin with a water drop icon marks a specific location in the center. The overall aesthetic is clean, modern, and professional." data-location="Chimalhuacán" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4BQuzGSqtsHLcsj1i4GcmzdHS9tmDlpLRBsrd6mYXRjem8Iy_3Utd-OPYF3u3Ewx-cDXE-sppLezyOdABF5DrI3AqVTvZjiS06in34RCbl7cwWglvx9FZwORYvXFRatOQ4I_M1Jv5mKrF9fhV12papFollOj9RKgYRg2lX8lG7Wj7yqZvG0cYJDkYcHH9AYxarsJ8vP60b-c5cAxVR5jDIbIbnMNRKc8j8abLc8QBdeC-vNbAEAJbpMCg_0jid5uzu3rgv6Hu-Q"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface/80 to-transparent flex items-end p-4">
+<button class="bg-surface-container-lowest border border-outline-variant px-4 py-2 rounded-lg flex items-center gap-2 font-label-sm text-on-background shadow-sm hover:bg-surface-container transition-colors w-full justify-center" type="button">
+<span class="material-symbols-outlined text-primary" data-icon="pin_drop">pin_drop</span>
+                                Ajustar ubicación en mapa
+                            </button>
+</div>
+</div>
+<p class="font-label-xs text-outline mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="info">info</span>
+                        Av. Las Torres 123, Barrio San Pedro, Chimalhuacán
+                    </p>
+</div>
+<div class="flex flex-col gap-stack-sm">
+<label class="font-label-sm text-on-surface-variant mb-1">Evidencia Fotográfica</label>
+<div class="border-2 border-dashed border-outline-variant rounded-xl p-stack-md flex flex-col items-center justify-center bg-surface hover:bg-surface-container-low hover:border-primary transition-colors cursor-pointer text-center gap-2">
+<span class="material-symbols-outlined text-4xl text-outline" data-icon="add_a_photo">add_a_photo</span>
+<p class="font-body-md text-on-surface-variant">Toca para tomar o subir una foto</p>
+<p class="font-label-xs text-outline">Formato JPG o PNG, máx 5MB</p>
+</div>
+</div>
+<div class="flex flex-col gap-stack-sm">
+<label class="font-label-sm text-on-surface-variant mb-2">Tipo de Fuga</label>
+<div class="grid sm:grid-cols-2 gap-3"><!-- Superficial (Active/Selected State) -->
+<label class="flex items-center gap-3 p-4 bg-primary text-on-primary rounded-xl cursor-pointer shadow-sm transition-all border border-primary">
+<input checked="" class="hidden" name="tipo_fuga" type="radio"/>
+<span class="material-symbols-outlined text-2xl">waves</span>
+<span class="font-label-sm font-bold">Superficial</span>
+</label>
+<!-- Tubería Principal (Inactive State) -->
+<label class="flex items-center gap-3 p-4 bg-surface border border-outline-variant rounded-xl cursor-pointer hover:bg-surface-container-low transition-all group">
+<input class="hidden" name="tipo_fuga" type="radio"/>
+<span class="material-symbols-outlined text-2xl text-primary">plumbing</span>
+<span class="font-label-sm text-on-surface">Tubería</span>
+</label>
+<!-- Toma Domiciliaria (Inactive State) -->
+<label class="flex items-center gap-3 p-4 bg-surface border border-outline-variant rounded-xl cursor-pointer hover:bg-surface-container-low transition-all group">
+<input class="hidden" name="tipo_fuga" type="radio"/>
+<span class="material-symbols-outlined text-2xl text-primary">home</span>
+<span class="font-label-sm text-on-surface">Toma dom.</span>
+</label>
+<!-- Drenaje (Inactive State) -->
+<label class="flex items-center gap-3 p-4 bg-surface border border-outline-variant rounded-xl cursor-pointer hover:bg-surface-container-low transition-all group">
+<input class="hidden" name="tipo_fuga" type="radio"/>
+<span class="material-symbols-outlined text-2xl text-primary">opacity</span>
+<span class="font-label-sm text-on-surface">Drenaje</span>
+</label></div>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-on-surface-variant mb-1">Descripción Adicional (Opcional)</label>
+<textarea class="bg-surface-container-lowest border border-outline-variant rounded-lg p-3 font-body-md text-on-background focus:border-primary focus:ring-1 focus:ring-primary transition-colors resize-none placeholder:text-outline-variant" placeholder="Ej: La fuga comenzó ayer por la tarde..." rows="3"></textarea>
+</div>
+</section>
+<div class="mt-4 pt-4 border-t border-outline-variant flex flex-col sm:flex-row gap-3 justify-end">
+<button class="px-6 py-3 border border-primary text-primary rounded-lg font-label-sm hover:bg-primary-container/10 transition-colors order-2 sm:order-1 text-center w-full sm:w-auto" type="button">
+                    Cancelar
+                </button>
+<button class="px-6 py-3 bg-primary text-on-primary rounded-lg font-label-sm hover:bg-primary-fixed-variant transition-colors shadow-sm shadow-primary/20 flex justify-center items-center gap-2 order-1 sm:order-2 w-full sm:w-auto" type="submit">
+                    Enviar Reporte
+                    <span class="material-symbols-outlined text-[18px]" data-icon="send">send</span>
+</button>
+</div>
+</form>
+</main>
+<!-- BottomNavBar (Hidden on md and up) -->
+<nav class="md:hidden bg-surface-container dark:bg-on-background font-label-xs text-label-xs docked full-width bottom-0 rounded-t-xl border-t border-outline-variant dark:border-outline shadow-sm fixed bottom-0 w-full z-50 flex justify-around items-center h-20 px-4 pb-safe">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary dark:hover:text-primary-fixed-dim active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+            Home
+        </a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary dark:hover:text-primary-fixed-dim active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="map">map</span>
+            Mapa
+        </a>
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary-fixed-dim text-on-secondary-container dark:text-on-secondary-fixed rounded-full px-4 py-1 hover:text-primary dark:hover:text-primary-fixed-dim active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="plumbing" data-weight="fill">plumbing</span>
+            Servicios
+        </a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary dark:hover:text-primary-fixed-dim active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+            Usuario
+        </a>
+</nav>
+</body></html>
