@@ -44,8 +44,10 @@ class AuthService {
         'block': block,
         'exterior_number': exteriorNumber,
       });
+      print(response.data);
       return UserModel.fromJson(response.data);
     } catch (e) {
+      print(e);
       rethrow;
     }
   }

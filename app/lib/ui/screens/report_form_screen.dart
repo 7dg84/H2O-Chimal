@@ -106,7 +106,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                         Icon(Icons.add_a_photo_outlined, size: 40, color: Colors.grey),
                         SizedBox(height: 8),
                         Text('Toca para tomar o subir una foto', style: TextStyle(color: Colors.grey, fontSize: 13)),
-                        Text('Formato JPG o PNG, máx 5MB', style: TextStyle(color: Colors.grey.withOpacity(0.6), fontSize: 11)),
+                        Text('Formato JPG o PNG, máx 5MB', style: TextStyle(color: Colors.grey, fontSize: 11)),
                       ],
                     ),
                 ),

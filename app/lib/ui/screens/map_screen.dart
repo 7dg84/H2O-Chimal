@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlng/latlng.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../core/config.dart';
 
@@ -11,9 +12,9 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  GoogleMapController? _mapController;
+  final MapController _mapController = MapController();
   Position? _currentPosition;
-  final Set<Marker> _markers = {};
+  final List<Marker> _markers = [];
 
   @override
   void initState() {
@@ -41,13 +42,10 @@ class _MapScreenState extends State<MapScreen> {
       _currentPosition = position;
     });
 
-    if (_mapController != null) {
-      _mapController!.animateCamera(
-        CameraUpdate.newLatLng(
-          LatLng(position.latitude, position.longitude),
-        ),
-      );
-    }
+    _mapController.move(
+      LatLng(position.latitude, position.longitude),
+      15.0,
+    );
   }
 
   @override
@@ -58,16 +56,34 @@ class _MapScreenState extends State<MapScreen> {
       ),
       body: Stack(
         children: [
-          GoogleMap(
-            initialCameraPosition: const CameraPosition(
-              target: LatLng(19.4184, -98.9452), // Chimalhuacán coordinates
-              zoom: 14,
+          FlutterMap(
+            mapController: _mapController,
+            options: MapOptions(
+              initialCenter: LatLng(19.4184, -98.9452), // Chimalhuacán
+              initialZoom: 14.0,
             ),
-            onMapCreated: (controller) => _mapController = controller,
-            myLocationEnabled: true,
-            myLocationButtonEnabled: false,
-            markers: _markers,
-            style: _mapStyle, // Custom silver/desaturated style
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.h2ochimal.app',
+              ),
+              MarkerLayer(
+                markers: [
+                  if (_currentPosition != null)
+                    Marker(
+                      point: LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+                      width: 40,
+                      height: 40,
+                      child: const Icon(
+                        Icons.person_pin_circle,
+                        color: Colors.blue,
+                        size: 40,
+                      ),
+                    ),
+                  ..._markers,
+                ],
+              ),
+            ],
           ),
           PositionBag(
             onReportTap: () {
@@ -83,9 +99,6 @@ class _MapScreenState extends State<MapScreen> {
       ),
     );
   }
-
-  // Placeholder for map style string to match "desaturated" look
-  final String _mapStyle = ''; 
 }
 
 class PositionBag extends StatelessWidget {

@@ -16,7 +16,8 @@ dependencies:
   dio_cookie_manager: ^3.1.1
   cookie_jar: ^4.0.8
   provider: ^6.1.1
-  google_maps_flutter: ^2.5.3
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.1
   geolocator: ^10.1.0
   image_picker: ^1.0.7
   flutter_secure_storage: ^9.0.0

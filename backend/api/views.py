@@ -113,6 +113,11 @@ class ReportViewSet(viewsets.ModelViewSet):
         AuditLog.objects.create(user=request.user, action='change_status', target_type='report', target_id=str(
             report.id), metadata={'status': new_status, 'note': note})
         return Response({'status': 'ok', 'report': ReportSerializer(report).data})
+    
+    def destroy(self, request, *args, **kwargs):
+        if self.get_object().status != 'Recibido':
+            return Response({'error': 'Only reports in "Recibido" status can be deleted'}, status=status.HTTP_400_BAD_REQUEST)
+        return super().destroy(request, *args, **kwargs)
 
 
 class DocumentViewSet(viewsets.ModelViewSet):
@@ -168,3 +173,33 @@ class TramiteViewSet(viewsets.ModelViewSet):
     queryset = Tramite.objects.all().order_by('-created_at')
     serializer_class = TramiteSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user = getattr(self.request, 'user', None)
+        # citizens see only their own reports,
+        if user and getattr(user, 'role', '') == 'citizen':
+            qs = qs.filter(user=user)
+        # operators see assigned to them by default
+        if user and getattr(user, 'role', '') == 'operator':
+            qs = qs.all()
+        return qs
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        if self.action in ['list', 'retrieve', 'destroy']:
+            permission_classes = [permissions.IsAuthenticated]
+        elif self.action in ['update', 'partial_update']:
+            permission_classes = [IsOperatorOrAdmin]
+        else:
+            permission_classes = [IsOperatorOrAdmin]
+        return [permission() for permission in permission_classes]
+
+    def destroy(self, request, *args, **kwargs):
+        user = getattr(request, 'user', None)
+        if user and getattr(user, 'role', '') != 'admin':
+            if self.get_object().status != 'Creado':
+                return Response({'error': 'Only tramites in "Creado" status can be deleted'}, status=status.HTTP_400_BAD_REQUEST)
+        return super().destroy(request, *args, **kwargs)

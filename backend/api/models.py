@@ -126,10 +126,18 @@ class Tramite(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     service = models.ForeignKey(Service, on_delete=models.PROTECT)
-    folio = models.CharField(max_length=50, unique=True)
+    folio = models.PositiveBigIntegerField(unique=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50, choices=STATUS, default='Creado')
     notes = models.TextField(blank=True)
+    
+    def save(self, *args, **kwargs):
+        last = Tramite.objects.order_by('-folio').first()
+        self.folio = (last.folio + 1) if last else 1
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"Tramite:{self.id} by {self.user}"
 
 
 class AuditLog(models.Model):

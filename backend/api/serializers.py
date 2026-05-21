@@ -62,7 +62,7 @@ class ReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Report
         fields = '__all__'
-        read_only_fields = ['user', 'folio', 'reported_at', 'status',
+        read_only_fields = ['id', 'user', 'folio', 'reported_at', 'status',
                             'assigned_operator_id', 'estimated_time_interval']
 
     def create(self, validated_data):
@@ -128,3 +128,11 @@ class TramiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tramite
         fields = '__all__'
+
+    def create(self, validated_data):
+        validated_data.pop('user', None)  # Ensure user is not set by client
+        validated_data.pop('folio', None)  # Ensure folio is not set by client
+        user = self.context['request'].user
+        validated_data['user'] = user
+        return super().create(validated_data)
+

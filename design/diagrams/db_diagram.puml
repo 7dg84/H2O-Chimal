@@ -1,0 +1,128 @@
+@startuml
+' Database ER diagram for H2O Chimal
+hide circle
+skinparam linetype ortho
+
+entity "users" as users {
+  * id : UUID
+  --
+  email : varchar
+  curp : varchar
+  name : varchar
+  phone : varchar
+  postal_code : varchar
+  colonia : varchar
+  street : varchar
+  block : varchar
+  exterior_number : varchar
+  role : varchar
+}
+
+entity "services" as services {
+  * id : UUID
+  --
+  name : varchar
+  description : text
+  response_time : varchar
+}
+
+entity "document_types" as document_types {
+  * id : UUID
+  --
+  name : varchar
+  description : text
+}
+
+entity "service_requirements" as service_requirements {
+  * id : serial
+  --
+  service_id : UUID
+  document_type_id : UUID
+  required : bool
+  notes : text
+}
+
+entity "documents" as documents {
+  * id : UUID
+  --
+  user_id : UUID
+  service_id : UUID
+  document_type_id : UUID
+  storage_key : text
+  filename : varchar
+  mime_type : varchar
+  size : bigint
+  metadata : jsonb
+  version : int
+  uploaded_at : timestamp
+}
+
+entity "media" as media {
+  * id : UUID
+  --
+  report_id : UUID
+  storage_key : text
+  filename : varchar
+  mime_type : varchar
+  uploaded_at : timestamp
+}
+
+entity "reports" as reports {
+  * id : UUID
+  --
+  user_id : UUID
+  folio : bigint
+  reported_at : timestamp
+  latitude : numeric
+  longitude : numeric
+  location_text : varchar
+  report_type : varchar
+  description : text
+  status : varchar
+  assigned_operator_id : UUID
+  estimated_time_interval : varchar
+}
+
+entity "tramites" as tramites {
+  * id : UUID
+  --
+  user_id : UUID
+  service_id : UUID
+  folio : varchar
+  created_at : timestamp
+  status : varchar
+  notes : text
+}
+
+entity "audit_log" as audit_log {
+  * id : bigint
+  --
+  user_id : UUID
+  action : varchar
+  target_type : varchar
+  target_id : varchar
+  metadata : jsonb
+  created_at : timestamp
+}
+
+' Relationships
+users ||..o{ reports : "1..n"
+users ||..o{ documents : "1..n"
+users ||..o{ tramites : "1..n"
+
+services ||..o{ service_requirements : "1..n"
+document_types ||..o{ service_requirements : "1..n"
+
+services ||..o{ documents : "1..n"
+service_requirements }o--|| document_types : requires
+
+reports ||..o{ media : "1..n"
+reports }o--|| users : reported_by
+documents }o--|| document_types : is_type
+documents }o--|| users : uploaded_by
+tramites }o--|| services : for_service
+tramites }o--|| users : requested_by
+
+audit_log }o--|| users : performed_by
+
+@enduml
