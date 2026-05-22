@@ -1,10 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ReportViewSet, DocumentViewSet, ServiceViewSet, TramiteViewSet, RegisterView, login, logout, user_info
+from .views import ReportViewSet, DocumentViewSet, ServiceViewSet, TramiteViewSet, RegisterView, MediaViewSet, login, logout, user_info
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 router = DefaultRouter()
 router.register(r'reports', ReportViewSet, basename='report')
+router.register(r'media', MediaViewSet, basename='media')
 router.register(r'documents', DocumentViewSet, basename='document')
 router.register(r'services', ServiceViewSet, basename='service')
 router.register(r'tramites', TramiteViewSet, basename='tramite')

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Report, Document, Service, DocumentType, Tramite
+from .models import User, Report, Document, Service, DocumentType, Tramite, Media
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.core.files.storage import default_storage
@@ -80,6 +80,25 @@ class StatusChangeSerializer(serializers.Serializer):
     status = serializers.CharField()
     note = serializers.CharField(required=False, allow_blank=True)
 
+class MediaSerializer(serializers.ModelSerializer):
+    presigned_url = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Media
+        fields = '__all__'
+
+    def get_presigned_url(self, obj):
+        if not obj.storage_key:
+            return None
+        # Try to build presigned URL using boto3 via default storage
+        try:
+            storage = default_storage
+            # storage.bucket_name and connection.client should exist for S3Boto3Storage
+            client = storage.connection.meta.client
+            bucket = storage.bucket_name
+            return client.generate_presigned_url('get_object', Params={'Bucket': bucket, 'Key': obj.storage_key}, ExpiresIn=3600)
+        except Exception:
+            return None
 
 class DocumentSerializer(serializers.ModelSerializer):
     presigned_url = serializers.SerializerMethodField(read_only=True)

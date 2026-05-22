@@ -1,8 +1,8 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-from .models import Report, Document, Service, Tramite, AuditLog
-from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UserSerializer
+from .models import Report, Document, Service, Tramite, AuditLog, Media
+from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UserSerializer, MediaSerializer
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 from django.shortcuts import get_object_or_404
@@ -10,6 +10,7 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 from .auth import CookieTokenAuthentication
 from .permissions import IsOperator, IsAdmin, IsOperatorOrAdmin
+from h2o.storage_backends import MediaStorage
 
 
 class RegisterView(viewsets.GenericViewSet):
@@ -113,11 +114,56 @@ class ReportViewSet(viewsets.ModelViewSet):
         AuditLog.objects.create(user=request.user, action='change_status', target_type='report', target_id=str(
             report.id), metadata={'status': new_status, 'note': note})
         return Response({'status': 'ok', 'report': ReportSerializer(report).data})
-    
+
     def destroy(self, request, *args, **kwargs):
         if self.get_object().status != 'Recibido':
             return Response({'error': 'Only reports in "Recibido" status can be deleted'}, status=status.HTTP_400_BAD_REQUEST)
         return super().destroy(request, *args, **kwargs)
+
+
+class MediaViewSet(viewsets.ModelViewSet):
+    queryset = Media.objects.all().order_by('-uploaded_at')
+    serializer_class = MediaSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    storage = MediaStorage()
+
+    def create(self, request, *args, **kwargs):
+        # Accept file upload or storage_key
+        file = request.FILES.get('file')
+        data = request.data.copy()
+        if file:
+            # save using default storage (S3/Ceph)
+            key = self.storage.save(file.name, file)
+            data['storage_key'] = key
+            data['filename'] = file.name
+            data['mime_type'] = file.content_type
+            data['size'] = file.size
+        else:
+            return Response({'error': 'File upload required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    # def destroy(self, request, *args, **kwargs):
+    #     instance = self.get_object()
+    #     # delete from storage
+    #     try:
+    #         if instance.storage_key:
+    #             default_storage.delete(instance.storage_key)
+    #     except Exception:
+    #         pass
+    #     instance.delete()
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user = getattr(self.request, 'user', None)
+        if user and getattr(user, 'role', '') == 'operator':
+            return qs
+        else:
+            return None
 
 
 class DocumentViewSet(viewsets.ModelViewSet):
