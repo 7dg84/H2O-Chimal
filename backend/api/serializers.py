@@ -77,7 +77,8 @@ class ReportSerializer(serializers.ModelSerializer):
     
     def get_media(self, obj):
         media_qs = Media.objects.filter(report=obj)
-        return MediaSerializer(media_qs, many=True).data
+        # Return only list of media IDs to avoid generating presigned URLs for every media
+        return [str(m.id) for m in media_qs]
 
 
 class AssignSerializer(serializers.Serializer):
@@ -94,6 +95,8 @@ class MediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Media
         fields = '__all__'
+        # `report` must be provided when creating a Media, but must not be updatable afterwards
+        read_only_fields = ['id', 'uploaded_at']
 
     def get_presigned_url(self, obj):
         if not obj.storage_key:
@@ -113,6 +116,25 @@ class MediaSerializer(serializers.ModelSerializer):
             return client.generate_presigned_url('get_object', Params={'Bucket': bucket, 'Key': obj.storage_key}, ExpiresIn=3600)
         except Exception:
             return None
+        
+    def create(self, validated_data):
+        # validate if the report belongs to the user (if citizen) or is assigned to the operator (if operator)
+        request = self.context['request']
+        user = getattr(request, 'user', None)
+        report = validated_data.get('report')
+        # report is required on create
+        if not report:
+            raise serializers.ValidationError({'report': 'Este campo es requerido.'})
+        if user and getattr(user, 'role', '') == 'citizen':
+            if report.user_id != user.id:
+                raise serializers.ValidationError('Reporte no pertenece al usuario')
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        # Prevent changing the `report` of an existing Media
+        if 'report' in validated_data and validated_data['report'] != instance.report:
+            raise serializers.ValidationError({'report': 'No se puede cambiar el reporte asociado a un medio.'})
+        return super().update(instance, validated_data)
 
 class DocumentSerializer(serializers.ModelSerializer):
     presigned_url = serializers.SerializerMethodField(read_only=True)

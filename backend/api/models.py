@@ -97,7 +97,7 @@ class Report(models.Model):
         super().save(*args, **kwargs)
         
     def __str__(self):
-        return f"Report {self.folio} by {self.user}"
+        return f"ID {self.id} Report {self.folio} by {self.user}"
 
 
 class Document(models.Model):

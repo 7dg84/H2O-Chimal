@@ -145,17 +145,20 @@ class MediaViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    def update(self, request, *args, **kwargs):
+        return Response({'error': 'Media updates are not allowed'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # def destroy(self, request, *args, **kwargs):
-    #     instance = self.get_object()
-    #     # delete from storage
-    #     try:
-    #         if instance.storage_key:
-    #             default_storage.delete(instance.storage_key)
-    #     except Exception:
-    #         pass
-    #     instance.delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        # delete from storage
+        try:
+            if instance.storage_key:
+                default_storage.delete(instance.storage_key)
+        except Exception:
+            return Response({'error': 'Failed to delete media from storage'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get_queryset(self):
         qs = super().get_queryset()
