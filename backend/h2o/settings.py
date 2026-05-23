@@ -91,3 +91,5 @@ AWS_S3_ENDPOINT_URL = os.environ.get('CEPH_ENDPOINT')
 AWS_S3_REGION_NAME = os.environ.get('CEPH_REGION', '')
 AWS_S3_SIGNATURE_VERSION = 's3v4'
 AWS_S3_ADDRESSING_STYLE = 'path'
+# Public endpoint used to sign presigned URLs (can differ from internal endpoint)
+CEPH_PUBLIC_ENDPOINT = os.environ.get('CEPH_PUBLIC_ENDPOINT', AWS_S3_ENDPOINT_URL)

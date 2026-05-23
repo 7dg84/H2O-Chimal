@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.core.files.storage import default_storage
 import re
+import os
+import boto3
 from .models import ServiceRequirement
 from h2o.storage_backends import MediaStorage
 
@@ -99,9 +101,15 @@ class MediaSerializer(serializers.ModelSerializer):
         # Try to build presigned URL using boto3 via default storage
         try:
             storage = MediaStorage()
-            # storage.bucket_name and connection.client should exist for S3Boto3Storage
-            client = storage.connection.meta.client
             bucket = storage.bucket_name
+            # Use public endpoint for signing if provided in settings, otherwise fall back to storage's endpoint
+            endpoint = getattr(settings, 'CEPH_PUBLIC_ENDPOINT', None) or storage.connection.meta.client.meta.endpoint_url
+            client = boto3.client('s3',
+                endpoint_url=endpoint,
+                aws_access_key_id=getattr(settings, 'AWS_ACCESS_KEY_ID', os.environ.get('CEPH_ACCESS_KEY')),
+                aws_secret_access_key=getattr(settings, 'AWS_SECRET_ACCESS_KEY', os.environ.get('CEPH_SECRET_KEY')),
+                region_name=getattr(settings, 'AWS_S3_REGION_NAME', os.environ.get('CEPH_REGION')),
+            )
             return client.generate_presigned_url('get_object', Params={'Bucket': bucket, 'Key': obj.storage_key}, ExpiresIn=3600)
         except Exception:
             return None
@@ -119,9 +127,18 @@ class DocumentSerializer(serializers.ModelSerializer):
         # Try to build presigned URL using boto3 via default storage
         try:
             storage = default_storage
-            # storage.bucket_name and connection.client should exist for S3Boto3Storage
-            client = storage.connection.meta.client
-            bucket = storage.bucket_name
+            bucket = getattr(storage, 'bucket_name', None)
+            endpoint = getattr(settings, 'CEPH_PUBLIC_ENDPOINT', None)
+            # If we have a public endpoint, create a boto3 client that will sign URLs for that host
+            if endpoint:
+                client = boto3.client('s3',
+                    endpoint_url=endpoint,
+                    aws_access_key_id=getattr(settings, 'AWS_ACCESS_KEY_ID', os.environ.get('CEPH_ACCESS_KEY')),
+                    aws_secret_access_key=getattr(settings, 'AWS_SECRET_ACCESS_KEY', os.environ.get('CEPH_SECRET_KEY')),
+                    region_name=getattr(settings, 'AWS_S3_REGION_NAME', os.environ.get('CEPH_REGION')),
+                )
+            else:
+                client = storage.connection.meta.client
             return client.generate_presigned_url('get_object', Params={'Bucket': bucket, 'Key': obj.storage_key}, ExpiresIn=3600)
         except Exception:
             return None
