@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 import re
 from .models import ServiceRequirement
+from h2o.storage_backends import MediaStorage
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -59,6 +60,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class ReportSerializer(serializers.ModelSerializer):
+    media = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Report
         fields = '__all__'
@@ -70,6 +72,10 @@ class ReportSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         validated_data['user'] = user
         return super().create(validated_data)
+    
+    def get_media(self, obj):
+        media_qs = Media.objects.filter(report=obj)
+        return MediaSerializer(media_qs, many=True).data
 
 
 class AssignSerializer(serializers.Serializer):
@@ -92,7 +98,7 @@ class MediaSerializer(serializers.ModelSerializer):
             return None
         # Try to build presigned URL using boto3 via default storage
         try:
-            storage = default_storage
+            storage = MediaStorage()
             # storage.bucket_name and connection.client should exist for S3Boto3Storage
             client = storage.connection.meta.client
             bucket = storage.bucket_name

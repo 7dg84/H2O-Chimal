@@ -160,10 +160,18 @@ class MediaViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         qs = super().get_queryset()
         user = getattr(self.request, 'user', None)
-        if user and getattr(user, 'role', '') == 'operator':
+        if user and getattr(user, 'role', '') == 'operator' or getattr(user, 'role', '') == 'admin':
+            return qs
+        elif user and getattr(user, 'role', '') == 'citizen':
+            qs = qs.filter(report__user=user)
             return qs
         else:
             return None
+        
+    def list(self, request, *args, **kwargs):
+        if getattr(request.user, 'role', '') == 'citizen':
+            return Response({'error': 'Citizens cannot list media directly'}, status=status.HTTP_403_FORBIDDEN)
+        return super().list(request, *args, **kwargs)
 
 
 class DocumentViewSet(viewsets.ModelViewSet):
