@@ -10,7 +10,7 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 from .auth import CookieTokenAuthentication
 from .permissions import IsOperator, IsAdmin, IsOperatorOrAdmin
-from h2o.storage_backends import MediaStorage
+from h2o.storage_backends import MediaStorage, ReportStorage
 
 
 class RegisterView(viewsets.GenericViewSet):
@@ -41,8 +41,7 @@ def login(request):
         return Response({'error': 'Invalid password'}, status=status.HTTP_401_UNAUTHORIZED)
 
     token, _ = Token.objects.get_or_create(user=user)
-    ser = UserSerializer(user)
-    response = Response({'user': ser.data}, status=status.HTTP_200_OK)
+    response = Response({'succes': 'ok'}, status=status.HTTP_200_OK)
     response.set_cookie(key='auth_token', value=token.key,
                         httponly=True, samesite='Lax', max_age=86400*30)
     return response
@@ -119,6 +118,11 @@ class ReportViewSet(viewsets.ModelViewSet):
         if self.get_object().status != 'Recibido':
             return Response({'error': 'Only reports in "Recibido" status can be deleted'}, status=status.HTTP_400_BAD_REQUEST)
         return super().destroy(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+        if self.get_object().status != 'Recibido':
+            return Response({'error': 'Only reports in "Recibido" status can be updated'}, status=status.HTTP_400_BAD_REQUEST)
+        return super().update(request, *args, **kwargs)
 
 
 class MediaViewSet(viewsets.ModelViewSet):
@@ -181,6 +185,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
     queryset = Document.objects.all().order_by('-uploaded_at')
     serializer_class = DocumentSerializer
     permission_classes = [permissions.IsAuthenticated]
+    storage = ReportStorage()
 
     def create(self, request, *args, **kwargs):
         # Accept file upload or storage_key
@@ -188,11 +193,13 @@ class DocumentViewSet(viewsets.ModelViewSet):
         data = request.data.copy()
         if file:
             # save using default storage (S3/Ceph)
-            key = default_storage.save(file.name, file)
+            key = self.storage.save(file.name, file)
             data['storage_key'] = key
             data['filename'] = file.name
             data['mime_type'] = file.content_type
             data['size'] = file.size
+        else:
+            return Response({'error': 'File upload required'}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
@@ -246,7 +253,7 @@ class TramiteViewSet(viewsets.ModelViewSet):
         """
         Instantiates and returns the list of permissions that this view requires.
         """
-        if self.action in ['list', 'retrieve', 'destroy']:
+        if self.action in ['list','create', 'retrieve', 'destroy']:
             permission_classes = [permissions.IsAuthenticated]
         elif self.action in ['update', 'partial_update']:
             permission_classes = [IsOperatorOrAdmin]

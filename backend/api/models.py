@@ -100,18 +100,6 @@ class Report(models.Model):
         return f"ID {self.id} Report {self.folio} by {self.user}"
 
 
-class Document(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
-    service = models.ForeignKey(Service, null=True, blank=True, on_delete=models.SET_NULL)
-    document_type = models.ForeignKey(DocumentType, on_delete=models.PROTECT)
-    storage_key = models.TextField()
-    filename = models.CharField(max_length=255, blank=False)
-    mime_type = models.CharField(max_length=100, blank=True)
-    size = models.BigIntegerField(null=True, blank=True)
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-
-
 class Media(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     report = models.ForeignKey(Report, on_delete=models.CASCADE)
@@ -138,6 +126,18 @@ class Tramite(models.Model):
     
     def __str__(self):
         return f"Tramite:{self.id} by {self.user}"
+    
+
+class Document(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+    tramite = models.ForeignKey(Tramite, null=False, blank=False, on_delete=models.CASCADE)
+    document_type = models.ForeignKey(DocumentType, on_delete=models.PROTECT)
+    storage_key = models.TextField()
+    filename = models.CharField(max_length=255, blank=False)
+    mime_type = models.CharField(max_length=100, blank=True)
+    size = models.BigIntegerField(null=True, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
 
 
 class AuditLog(models.Model):

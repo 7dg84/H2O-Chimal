@@ -165,7 +165,6 @@ class DocumentSerializer(serializers.ModelSerializer):
         except Exception:
             return None
 
-
 class ServiceSerializer(serializers.ModelSerializer):
     requirements = serializers.SerializerMethodField()
 
