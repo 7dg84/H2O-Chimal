@@ -117,8 +117,17 @@ class ReportViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         if self.get_object().status != 'Recibido':
             return Response({'error': 'Only reports in "Recibido" status can be deleted'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # Delete also media
+            media_qs = Media.objects.filter(report=self.get_object())
+            for media in media_qs:
+                try:
+                    MediaStorage().delete(media.storage_key)
+                except Exception:
+                    return Response({'error': 'Failed to delete media from storage'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                media.delete()
         return super().destroy(request, *args, **kwargs)
-    
+
     def update(self, request, *args, **kwargs):
         if self.get_object().status != 'Recibido':
             return Response({'error': 'Only reports in "Recibido" status can be updated'}, status=status.HTTP_400_BAD_REQUEST)
@@ -149,7 +158,7 @@ class MediaViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
+
     def update(self, request, *args, **kwargs):
         return Response({'error': 'Media updates are not allowed'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -158,7 +167,7 @@ class MediaViewSet(viewsets.ModelViewSet):
         # delete from storage
         try:
             if instance.storage_key:
-                default_storage.delete(instance.storage_key)
+                self.storage.delete(instance.storage_key)
         except Exception:
             return Response({'error': 'Failed to delete media from storage'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         instance.delete()
@@ -167,18 +176,21 @@ class MediaViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         qs = super().get_queryset()
         user = getattr(self.request, 'user', None)
-        if user and getattr(user, 'role', '') == 'operator' or getattr(user, 'role', '') == 'admin':
-            return qs
-        elif user and getattr(user, 'role', '') == 'citizen':
+        if user and getattr(user, 'role', '') == 'citizen':
             qs = qs.filter(report__user=user)
+            return qs
+        elif user and getattr(user, 'role', '') in ['operator', 'admin']:
             return qs
         else:
             return None
-        
+
     def list(self, request, *args, **kwargs):
         if getattr(request.user, 'role', '') == 'citizen':
             return Response({'error': 'Citizens cannot list media directly'}, status=status.HTTP_403_FORBIDDEN)
-        return super().list(request, *args, **kwargs)
+        elif getattr(request.user, 'role', '') in ['operator', 'admin']:
+            return super().list(request, *args, **kwargs)
+        else:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class DocumentViewSet(viewsets.ModelViewSet):
@@ -206,14 +218,17 @@ class DocumentViewSet(viewsets.ModelViewSet):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    def update(self, request, *args, **kwargs):
+        return Response({"error": "Document updates are not allowed"}, status=status.HTTP_400_BAD_REQUEST)
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         # delete from storage
         try:
             if instance.storage_key:
-                default_storage.delete(instance.storage_key)
+                self.storage.delete(instance.storage_key)
         except Exception:
-            pass
+            return Response({'error': 'Failed to delete document from storage'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -223,8 +238,18 @@ class DocumentViewSet(viewsets.ModelViewSet):
         if user and getattr(user, 'role', '') == 'citizen':
             qs = qs.filter(user=user)
             return qs
+        elif user and (getattr(user, 'role', '') in ['operator', 'admin']):
+            return qs
         else:
             return None
+
+    def list(self, request, *args, **kwargs):
+        if getattr(request.user, 'role', '') == 'citizen':
+            return Response({'error': 'Citizens cannot list documents directly'}, status=status.HTTP_403_FORBIDDEN)
+        elif getattr(request.user, 'role', '') in ['operator', 'admin']:
+            return super().list(request, *args, **kwargs)
+        else:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
@@ -253,7 +278,7 @@ class TramiteViewSet(viewsets.ModelViewSet):
         """
         Instantiates and returns the list of permissions that this view requires.
         """
-        if self.action in ['list','create', 'retrieve', 'destroy']:
+        if self.action in ['list', 'create', 'retrieve', 'destroy']:
             permission_classes = [permissions.IsAuthenticated]
         elif self.action in ['update', 'partial_update']:
             permission_classes = [IsOperatorOrAdmin]
@@ -266,4 +291,5 @@ class TramiteViewSet(viewsets.ModelViewSet):
         if user and getattr(user, 'role', '') != 'admin':
             if self.get_object().status != 'Creado':
                 return Response({'error': 'Only tramites in "Creado" status can be deleted'}, status=status.HTTP_400_BAD_REQUEST)
+            # elif self.get_object().status == 'Creado' 
         return super().destroy(request, *args, **kwargs)
