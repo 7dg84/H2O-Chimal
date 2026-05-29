@@ -322,9 +322,15 @@ Request:
 response:
 [
   {
-    "id": "65d48b0a-861b-4185-ad24-7e9d4ef662e4",
+    "id": "54d6032e-ba1b-43d3-b8fa-795348fd38f8",
+    "documents": [
+      {
+        "id": "1d33794a-9a1e-432b-9907-c56c544d6dae",
+        "filename": "img.jpg"
+      }
+    ],
     "folio": 18,
-    "created_at": "2026-05-24T11:35:11.364020-06:00",
+    "created_at": "2026-05-24T14:56:53.924019-06:00",
     "status": "Creado",
     "notes": "",
     "user": "f10104e3-1f91-40ad-8f23-e870ccdcbada",
@@ -334,12 +340,18 @@ response:
 ```
 Get: 
 ```json
-Request: /api/tramites/65d48b0a-861b-4185-ad24-7e9d4ef662e4/
+Request: /api/tramites/54d6032e-ba1b-43d3-b8fa-795348fd38f8/
 response:
 {
-  "id": "65d48b0a-861b-4185-ad24-7e9d4ef662e4",
+  "id": "54d6032e-ba1b-43d3-b8fa-795348fd38f8",
+  "documents": [
+    {
+      "id": "1d33794a-9a1e-432b-9907-c56c544d6dae",
+      "filename": "img.jpg"
+    }
+  ],
   "folio": 18,
-  "created_at": "2026-05-24T11:35:11.364020-06:00",
+  "created_at": "2026-05-24T14:56:53.924019-06:00",
   "status": "Creado",
   "notes": "",
   "user": "f10104e3-1f91-40ad-8f23-e870ccdcbada",
@@ -354,9 +366,10 @@ Request:
 }
 response:
 {
-  "id": "65d48b0a-861b-4185-ad24-7e9d4ef662e4",
-  "folio": 18,
-  "created_at": "2026-05-24T11:35:11.364020-06:00",
+  "id": "10257a61-0b8b-48ad-826d-58c86e44b5ae",
+  "documents": [],
+  "folio": 19,
+  "created_at": "2026-05-29T17:18:22.467372-06:00",
   "status": "Creado",
   "notes": "",
   "user": "f10104e3-1f91-40ad-8f23-e870ccdcbada",
@@ -365,7 +378,7 @@ response:
 ```
 Put:
 ```json
-Request: /api/tramites/65d48b0a-861b-4185-ad24-7e9d4ef662e4/
+Request: /api/tramites/10257a61-0b8b-48ad-826d-58c86e44b5ae/
 response:
 {
   "detail": "Usted no tiene permiso para realizar esta acción."
@@ -373,36 +386,39 @@ response:
 ```
 Delete:
 ```json
-Request: /api/tramites/65d48b0a-861b-4185-ad24-7e9d4ef662e4/
-response: 
+Request: /api/tramites/10257a61-0b8b-48ad-826d-58c86e44b5ae/
+response: 204
 ```
 ## documents: '/api/documents/'
 Get:
 ```json
 Request: 
 response:
+{
+  "error": "Citizens cannot list documents directly"
+}
 ```
 Get:
 ```json
-Request:
+Request: /api/documents/1d33794a-9a1e-432b-9907-c56c544d6dae/
 response:
+
 ```
 Post:
 ```bash
-Request:
 curl -X POST "http://localhost:8000/api/documents/"   -H "Authorization: Token eae4ff3c8d339446a4bc0fc260590a81aefcc94b"   -F "file=@img.jpg"   -F "tramite=54d6032e-ba1b-43d3-b8fa-795348fd38f8" -F "document_type=66f80579-3d55-45ae-905e-2c5b9f09b794"
 ```
 ```json
 response:
 {
-  "id":"f0b22bd9-dfe1-43c8-9a78-15cc54aae3f2",
+  "id":"1d33794a-9a1e-432b-9907-c56c544d6dae",
   "presigned_url":null,
-  "storage_key":"img_DOJCY8T.jpg",
+  "storage_key":"img_MuLILRo.jpg",
   "filename":"img.jpg",
   "mime_type":"image/jpeg",
   "size":46783,
-  "uploaded_at":"2026-05-29T15:33:47.887978-06:00",
-  "user":null,"tramite":"54d6032e-ba1b-43d3-b8fa-795348fd38f8",
+  "uploaded_at":"2026-05-29T16:36:51.269315-06:00",
+  "tramite":"54d6032e-ba1b-43d3-b8fa-795348fd38f8",
   "document_type":"66f80579-3d55-45ae-905e-2c5b9f09b794"
 }
 ```

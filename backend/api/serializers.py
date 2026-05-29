@@ -138,10 +138,12 @@ class MediaSerializer(serializers.ModelSerializer):
 
 class DocumentSerializer(serializers.ModelSerializer):
     presigned_url = serializers.SerializerMethodField(read_only=True)
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Document
         fields = '__all__'
+        read_only_fields = ['id', ]
 
     def get_presigned_url(self, obj):
         if not obj.storage_key:
@@ -165,6 +167,20 @@ class DocumentSerializer(serializers.ModelSerializer):
         except Exception:
             return None
 
+    def create(self, validated_data):
+        # Automatically associate the creating user with the Document
+        request = self.context.get('request')
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            raise serializers.ValidationError('Authentication required to create a Document')
+
+        # If the user is a citizen, ensure the tramite belongs to them
+        tramite = validated_data.get('tramite')
+        if tramite and getattr(user, 'role', '') == 'citizen' and tramite.user_id != user.id:
+            raise serializers.ValidationError('El tramite no pertenece al usuario autenticado')
+
+        return super().create(validated_data)
+
 class ServiceSerializer(serializers.ModelSerializer):
     requirements = serializers.SerializerMethodField()
 
@@ -186,12 +202,13 @@ class ServiceSerializer(serializers.ModelSerializer):
             })
         return out
 
+
 class TramiteSerializer(serializers.ModelSerializer):
     documents = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Tramite
         fields = '__all__'
-        read_only_fields = ['id', 'user', 'service', 'folio', 'created_at']
+        read_only_fields = ['id', 'user', 'folio', 'created_at']
 
     def create(self, validated_data):
         validated_data.pop('user', None)  # Ensure user is not set by client
@@ -204,5 +221,5 @@ class TramiteSerializer(serializers.ModelSerializer):
     
     def get_documents(self, obj):
         docs_qs = Document.objects.filter(tramite=obj)
-        return DocumentSerializer(docs_qs, many=True).data
+        return [{"id":d.id,"filename": d.filename} for d in docs_qs]
 
