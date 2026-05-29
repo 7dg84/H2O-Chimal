@@ -402,7 +402,17 @@ Get:
 ```json
 Request: /api/documents/1d33794a-9a1e-432b-9907-c56c544d6dae/
 response:
-
+{
+  "id": "1d33794a-9a1e-432b-9907-c56c544d6dae",
+  "presigned_url": "http://media.localhost:9000/h2o-reports/img_MuLILRo.jpg?AWSAccessKeyId=h2o_access&Signature=cpyXjffNDpcA1ZklMDWJi0CZS6g%3D&Expires=1780101011",
+  "storage_key": "img_MuLILRo.jpg",
+  "filename": "img.jpg",
+  "mime_type": "image/jpeg",
+  "size": 46783,
+  "uploaded_at": "2026-05-29T16:36:51.269315-06:00",
+  "tramite": "54d6032e-ba1b-43d3-b8fa-795348fd38f8",
+  "document_type": "66f80579-3d55-45ae-905e-2c5b9f09b794"
+}
 ```
 Post:
 ```bash
@@ -424,11 +434,14 @@ response:
 ```
 Put:
 ```json
-Request:
+Request: /api/documents/1d33794a-9a1e-432b-9907-c56c544d6dae/
 response:
+{
+  "error": "Document updates are not allowed"
+}
 ```
 Delete:
 ```json
-Request:
-response:
+Request: /api/documents/1d33794a-9a1e-432b-9907-c56c544d6dae/
+response: 204
 ```

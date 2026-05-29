@@ -115,17 +115,19 @@ class ReportViewSet(viewsets.ModelViewSet):
         return Response({'status': 'ok', 'report': ReportSerializer(report).data})
 
     def destroy(self, request, *args, **kwargs):
-        if self.get_object().status != 'Recibido':
-            return Response({'error': 'Only reports in "Recibido" status can be deleted'}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            # Delete also media
-            media_qs = Media.objects.filter(report=self.get_object())
-            for media in media_qs:
-                try:
-                    MediaStorage().delete(media.storage_key)
-                except Exception:
-                    return Response({'error': 'Failed to delete media from storage'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-                media.delete()
+        user = getattr(request, 'user', None)
+        if user and getattr(user, 'role', '') != 'admin':
+            if self.get_object().status != 'Recibido':
+                return Response({'error': 'Only reports in "Recibido" status can be deleted'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                # Delete also media
+                media_qs = Media.objects.filter(report=self.get_object())
+                for media in media_qs:
+                    try:
+                        MediaStorage().delete(media.storage_key)
+                    except Exception:
+                        return Response({'error': 'Failed to delete media from storage'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    media.delete()
         return super().destroy(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
@@ -291,5 +293,13 @@ class TramiteViewSet(viewsets.ModelViewSet):
         if user and getattr(user, 'role', '') != 'admin':
             if self.get_object().status != 'Creado':
                 return Response({'error': 'Only tramites in "Creado" status can be deleted'}, status=status.HTTP_400_BAD_REQUEST)
-            # elif self.get_object().status == 'Creado' 
+            elif self.get_object().status == 'Creado':
+                # Delete also documents
+                doc_qs = Document.objects.filter(tramite=self.get_object())
+                for doc in doc_qs:
+                    try:
+                        DocumentStorage().delete(doc.storage_key)
+                    except Exception:
+                        return Response({'error': 'Failed to delete document from storage'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    doc.delete()
         return super().destroy(request, *args, **kwargs)
