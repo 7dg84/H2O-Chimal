@@ -7,7 +7,7 @@ import re
 import os
 import boto3
 from .models import ServiceRequirement
-from h2o.storage_backends import MediaStorage
+from h2o.storage_backends import MediaStorage, DocumentStorage
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -107,13 +107,16 @@ class MediaSerializer(serializers.ModelSerializer):
             bucket = storage.bucket_name
             # Use public endpoint for signing if provided in settings, otherwise fall back to storage's endpoint
             endpoint = getattr(settings, 'CEPH_PUBLIC_ENDPOINT', None) or storage.connection.meta.client.meta.endpoint_url
-            client = boto3.client('s3',
-                endpoint_url=endpoint,
-                aws_access_key_id=getattr(settings, 'AWS_ACCESS_KEY_ID', os.environ.get('CEPH_ACCESS_KEY')),
-                aws_secret_access_key=getattr(settings, 'AWS_SECRET_ACCESS_KEY', os.environ.get('CEPH_SECRET_KEY')),
-                region_name=getattr(settings, 'AWS_S3_REGION_NAME', os.environ.get('CEPH_REGION')),
-            )
-            return client.generate_presigned_url('get_object', Params={'Bucket': bucket, 'Key': obj.storage_key}, ExpiresIn=3600)
+            # If we have a public endpoint, create a boto3 client that will sign URLs for that host
+            if endpoint:
+                client = boto3.client('s3',
+                    endpoint_url=endpoint,
+                    aws_access_key_id=getattr(settings, 'AWS_ACCESS_KEY_ID', os.environ.get('CEPH_ACCESS_KEY')),
+                    aws_secret_access_key=getattr(settings, 'AWS_SECRET_ACCESS_KEY', os.environ.get('CEPH_SECRET_KEY')),
+                    region_name=getattr(settings, 'AWS_S3_REGION_NAME', os.environ.get('CEPH_REGION')),
+                )
+            else:
+                client = storage.connection.meta.client
         except Exception:
             return None
         
@@ -150,8 +153,8 @@ class DocumentSerializer(serializers.ModelSerializer):
             return None
         # Try to build presigned URL using boto3 via default storage
         try:
-            storage = default_storage
-            bucket = getattr(storage, 'bucket_name', None)
+            storage = DocumentStorage()
+            bucket = storage.bucket_name
             endpoint = getattr(settings, 'CEPH_PUBLIC_ENDPOINT', None)
             # If we have a public endpoint, create a boto3 client that will sign URLs for that host
             if endpoint:

@@ -7,7 +7,7 @@ class MediaStorage(S3Boto3Storage):
     file_overwrite = False
     
     
-class ReportStorage(S3Boto3Storage):
-    bucket_name = os.environ.get('CEPH_BUCKET_REPORTS')  # o AWS_REPORT_BUCKET_NAME
+class DocumentStorage(S3Boto3Storage):
+    bucket_name = os.environ.get('CEPH_BUCKET_DOCUMENTS')  # o AWS_REPORT_BUCKET_NAME
     default_acl = 'private'
     file_overwrite = False

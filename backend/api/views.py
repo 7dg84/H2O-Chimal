@@ -10,7 +10,7 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 from .auth import CookieTokenAuthentication
 from .permissions import IsOperator, IsAdmin, IsOperatorOrAdmin
-from h2o.storage_backends import MediaStorage, ReportStorage
+from h2o.storage_backends import MediaStorage, DocumentStorage
 
 
 class RegisterView(viewsets.GenericViewSet):
@@ -197,7 +197,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
     queryset = Document.objects.all().order_by('-uploaded_at')
     serializer_class = DocumentSerializer
     permission_classes = [permissions.IsAuthenticated]
-    storage = ReportStorage()
+    storage = DocumentStorage()
 
     def create(self, request, *args, **kwargs):
         # Accept file upload or storage_key
