@@ -130,7 +130,7 @@ class Tramite(models.Model):
 
 class Document(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
     tramite = models.ForeignKey(Tramite, null=False, blank=False, on_delete=models.CASCADE)
     document_type = models.ForeignKey(DocumentType, on_delete=models.PROTECT)
     storage_key = models.TextField()

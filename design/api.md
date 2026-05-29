@@ -388,9 +388,23 @@ Request:
 response:
 ```
 Post:
-```json
+```bash
 Request:
+curl -X POST "http://localhost:8000/api/documents/"   -H "Authorization: Token eae4ff3c8d339446a4bc0fc260590a81aefcc94b"   -F "file=@img.jpg"   -F "tramite=54d6032e-ba1b-43d3-b8fa-795348fd38f8" -F "document_type=66f80579-3d55-45ae-905e-2c5b9f09b794"
+```
+```json
 response:
+{
+  "id":"f0b22bd9-dfe1-43c8-9a78-15cc54aae3f2",
+  "presigned_url":null,
+  "storage_key":"img_DOJCY8T.jpg",
+  "filename":"img.jpg",
+  "mime_type":"image/jpeg",
+  "size":46783,
+  "uploaded_at":"2026-05-29T15:33:47.887978-06:00",
+  "user":null,"tramite":"54d6032e-ba1b-43d3-b8fa-795348fd38f8",
+  "document_type":"66f80579-3d55-45ae-905e-2c5b9f09b794"
+}
 ```
 Put:
 ```json

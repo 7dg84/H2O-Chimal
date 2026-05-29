@@ -186,16 +186,23 @@ class ServiceSerializer(serializers.ModelSerializer):
             })
         return out
 
-
 class TramiteSerializer(serializers.ModelSerializer):
+    documents = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Tramite
         fields = '__all__'
+        read_only_fields = ['id', 'user', 'service', 'folio', 'created_at']
 
     def create(self, validated_data):
         validated_data.pop('user', None)  # Ensure user is not set by client
         validated_data.pop('folio', None)  # Ensure folio is not set by client
+        validated_data.pop('status', None)  # Ensure status is not set by client
+        validated_data.pop('notes', None)  # Ensure created_at is not set by client
         user = self.context['request'].user
         validated_data['user'] = user
         return super().create(validated_data)
+    
+    def get_documents(self, obj):
+        docs_qs = Document.objects.filter(tramite=obj)
+        return DocumentSerializer(docs_qs, many=True).data
 
