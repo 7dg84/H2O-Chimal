@@ -254,11 +254,17 @@ class DocumentViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
+class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
     permission_classes = [permissions.AllowAny]
 
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            permission_classes = [IsOperatorOrAdmin]
+        else:
+            permission_classes = [permissions.AllowAny]
+        return [permission() for permission in permission_classes]
 
 class TramiteViewSet(viewsets.ModelViewSet):
     queryset = Tramite.objects.all().order_by('-created_at')
