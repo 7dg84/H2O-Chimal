@@ -11,6 +11,7 @@ from django.conf import settings
 from .auth import CookieTokenAuthentication
 from .permissions import IsOperator, IsAdmin, IsOperatorOrAdmin
 from h2o.storage_backends import MediaStorage, DocumentStorage
+from django.core.exceptions import ValidationError
 
 
 class RegisterView(viewsets.GenericViewSet):
@@ -97,10 +98,15 @@ class ReportViewSet(viewsets.ModelViewSet):
     def assign(self, request, pk=None):
         report = self.get_object()
         operator_id = request.data.get('operator_id')
-        if not operator_id:
+        if not operator_id or len(operator_id) != 36:
             return Response({'error': 'operator_id required'}, status=status.HTTP_400_BAD_REQUEST)
-        operator = get_object_or_404(
-            get_user_model(), id=operator_id, role='operator')
+        try:
+            operator = get_object_or_404(
+                get_user_model(), id=operator_id, role='operator')
+        except ValidationError:
+            return Response({'error': 'Invalid operator_id format'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            return Response({'error': 'Operator not found'}, status=status.HTTP_404_NOT_FOUND)
         report.assigned_operator_id = operator.id
         report.status = 'En atención'
         report.save()
