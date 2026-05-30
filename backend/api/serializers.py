@@ -215,7 +215,7 @@ class TramiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tramite
         fields = '__all__'
-        read_only_fields = ['id', 'user', 'folio', 'created_at']
+        read_only_fields = ['id', 'user', 'service', 'folio', 'created_at', 'status', 'notes']
 
     def create(self, validated_data):
         validated_data.pop('user', None)  # Ensure user is not set by client

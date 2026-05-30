@@ -331,6 +331,25 @@ class TramiteViewSet(viewsets.ModelViewSet):
                         return Response({'error': 'Failed to delete document from storage'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     doc.delete()
         return super().destroy(request, *args, **kwargs)
+    
+    @action(detail=True, methods=['post'], permission_classes=[IsAdmin])
+    def change_status(self, request, pk=None):
+        tramite = self.get_object()
+        new_status = request.data.get('status')
+        note = request.data.get('note')
+        if not new_status:
+            return Response({'error': 'status required'}, status=status.HTTP_400_BAD_REQUEST)
+        if new_status not in dict(Tramite.STATUS):
+            return Response({'error': 'Invalid status value'}, status=status.HTTP_400_BAD_REQUEST)
+        if new_status in ['Creado'] and getattr(request.user, 'role', '') != 'admin':
+            return Response({'error': 'Only admins can set status back to "Creado"'}, status=status.HTTP_403_FORBIDDEN)
+        tramite.status = new_status
+        if note:
+            tramite.notes = (tramite.notes or '') + f"\n{note} "
+        tramite.save()
+        AuditLog.objects.create(user=request.user, action='change_status', target_type='tramite', target_id=str(
+            tramite.id), metadata={'status': new_status, 'note': note})
+        return Response({'status': 'ok', 'tramite': TramiteSerializer(tramite).data})
 
 
 # Admin views
