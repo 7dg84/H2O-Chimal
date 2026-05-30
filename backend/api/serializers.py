@@ -67,10 +67,11 @@ class ReportSerializer(serializers.ModelSerializer):
         model = Report
         fields = '__all__'
         read_only_fields = ['id', 'user', 'folio', 'reported_at', 'status',
-                            'assigned_operator_id', 'estimated_time_interval']
+                            'assigned_operator_id', 'estimated_time_interval', 'notes']
 
     def create(self, validated_data):
         validated_data.pop('user', None)  # Ensure user is not set by client
+        validated_data.pop('notes', None) 
         user = self.context['request'].user
         validated_data['user'] = user
         return super().create(validated_data)

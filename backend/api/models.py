@@ -88,6 +88,7 @@ class Report(models.Model):
     report_type = models.CharField(max_length=50, choices=REPORT_TYPES, blank=False)
     description = models.TextField(blank=False)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Recibido')
+    notes = models.TextField(blank=True)
     assigned_operator_id = models.UUIDField(null=True, blank=True)
     estimated_time_interval = models.CharField(max_length=200, blank=True)
     

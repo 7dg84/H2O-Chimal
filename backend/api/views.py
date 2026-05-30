@@ -121,7 +121,13 @@ class ReportViewSet(viewsets.ModelViewSet):
         note = request.data.get('note')
         if not new_status:
             return Response({'error': 'status required'}, status=status.HTTP_400_BAD_REQUEST)
+        if new_status not in dict(Report.STATUS_CHOICES):
+            return Response({'error': 'Invalid status value'}, status=status.HTTP_400_BAD_REQUEST)
+        if new_status in ['Recibido', 'En revisión'] and getattr(request.user, 'role', '') == 'operator':
+            return Response({'error': 'Operators cannot set status back to "Recibido" or "En revisión"'}, status=status.HTTP_403_FORBIDDEN)
         report.status = new_status
+        if note:
+            report.notes = (report.notes or '') + f"\n{note} "
         report.save()
         AuditLog.objects.create(user=request.user, action='change_status', target_type='report', target_id=str(
             report.id), metadata={'status': new_status, 'note': note})
