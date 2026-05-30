@@ -1,8 +1,8 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-from .models import Report, Document, Service, Tramite, AuditLog, Media
-from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UserSerializer, MediaSerializer
+from .models import Report, Document, Service, Tramite, AuditLog, Media, DocumentType
+from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UserSerializer, MediaSerializer, DocumentTypeSerializer
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 from django.shortcuts import get_object_or_404
@@ -99,7 +99,8 @@ class ReportViewSet(viewsets.ModelViewSet):
         operator_id = request.data.get('operator_id')
         if not operator_id:
             return Response({'error': 'operator_id required'}, status=status.HTTP_400_BAD_REQUEST)
-        operator = get_object_or_404(get_user_model(), id=operator_id, role='operator')
+        operator = get_object_or_404(
+            get_user_model(), id=operator_id, role='operator')
         report.assigned_operator_id = operator.id
         report.status = 'En atención'
         report.save()
@@ -272,6 +273,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
             permission_classes = [permissions.AllowAny]
         return [permission() for permission in permission_classes]
 
+
 class TramiteViewSet(viewsets.ModelViewSet):
     queryset = Tramite.objects.all().order_by('-created_at')
     serializer_class = TramiteSerializer
@@ -317,3 +319,12 @@ class TramiteViewSet(viewsets.ModelViewSet):
                         return Response({'error': 'Failed to delete document from storage'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     doc.delete()
         return super().destroy(request, *args, **kwargs)
+
+
+# Admin views
+class DocumentTypeViewSet(viewsets.ModelViewSet):
+    queryset = DocumentType.objects.all()
+    serializer_class = DocumentTypeSerializer
+    permission_classes = [IsAdmin]
+
+    

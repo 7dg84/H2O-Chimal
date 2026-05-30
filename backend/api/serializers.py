@@ -89,6 +89,7 @@ class StatusChangeSerializer(serializers.Serializer):
     status = serializers.CharField()
     note = serializers.CharField(required=False, allow_blank=True)
 
+
 class MediaSerializer(serializers.ModelSerializer):
     presigned_url = serializers.SerializerMethodField(read_only=True)
 
@@ -139,6 +140,7 @@ class MediaSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'report': 'No se puede cambiar el reporte asociado a un medio.'})
         return super().update(instance, validated_data)
 
+
 class DocumentSerializer(serializers.ModelSerializer):
     presigned_url = serializers.SerializerMethodField(read_only=True)
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
@@ -184,6 +186,7 @@ class DocumentSerializer(serializers.ModelSerializer):
 
         return super().create(validated_data)
 
+
 class ServiceSerializer(serializers.ModelSerializer):
     requirements = serializers.SerializerMethodField()
 
@@ -226,3 +229,8 @@ class TramiteSerializer(serializers.ModelSerializer):
         docs_qs = Document.objects.filter(tramite=obj)
         return [{"id":d.id,"filename": d.filename} for d in docs_qs]
 
+
+class DocumentTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DocumentType
+        fields = '__all__'
