@@ -81,20 +81,26 @@ class ReportViewSet(viewsets.ModelViewSet):
         if user and getattr(user, 'role', '') == 'citizen':
             qs = qs.filter(user=user)
         # operators see assigned to them by default
-        if user and getattr(user, 'role', '') == 'operator':
+        elif user and getattr(user, 'role', '') == 'operator':
             qs = qs.filter(assigned_operator_id=str(user.id))
+        # admin see all by default
+        elif user and getattr(user, 'role', '') == 'admin':
+            qs = qs.all()
+        else:
+            qs = qs.none()
         # filter param to show assigned_to_me explicitly
-        if self.request.query_params.get('assigned_to_me') == 'true' and user:
+        if self.request.query_params.get('assigned_to_me') == 'true' and getattr(user, 'role', '') == 'operator':
             qs = qs.filter(assigned_operator_id=str(user.id))
         return qs
 
-    @action(detail=True, methods=['post'], permission_classes=[IsOperatorOrAdmin])
+    @action(detail=True, methods=['post'], permission_classes=[IsAdmin])
     def assign(self, request, pk=None):
         report = self.get_object()
         operator_id = request.data.get('operator_id')
         if not operator_id:
             return Response({'error': 'operator_id required'}, status=status.HTTP_400_BAD_REQUEST)
-        report.assigned_operator_id = operator_id
+        operator = get_object_or_404(get_user_model(), id=operator_id, role='operator')
+        report.assigned_operator_id = operator.id
         report.status = 'En atención'
         report.save()
         AuditLog.objects.create(user=request.user, action='assign_report', target_type='report', target_id=str(
@@ -240,7 +246,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
         if user and getattr(user, 'role', '') == 'citizen':
             qs = qs.filter(user=user)
             return qs
-        elif user and (getattr(user, 'role', '') in ['operator', 'admin']):
+        elif user and (getattr(user, 'role', '') in ['admin']):
             return qs
         else:
             return None
@@ -248,7 +254,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         if getattr(request.user, 'role', '') == 'citizen':
             return Response({'error': 'Citizens cannot list documents directly'}, status=status.HTTP_403_FORBIDDEN)
-        elif getattr(request.user, 'role', '') in ['operator', 'admin']:
+        elif getattr(request.user, 'role', '') in ['admin']:
             return super().list(request, *args, **kwargs)
         else:
             return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -261,7 +267,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            permission_classes = [IsOperatorOrAdmin]
+            permission_classes = [IsAdmin]
         else:
             permission_classes = [permissions.AllowAny]
         return [permission() for permission in permission_classes]
@@ -277,9 +283,11 @@ class TramiteViewSet(viewsets.ModelViewSet):
         # citizens see only their own reports,
         if user and getattr(user, 'role', '') == 'citizen':
             qs = qs.filter(user=user)
-        # operators see assigned to them by default
-        if user and getattr(user, 'role', '') == 'operator':
+        # operators see all by default
+        elif user and getattr(user, 'role', '') == 'admin':
             qs = qs.all()
+        else:
+            qs = qs.none()
         return qs
 
     def get_permissions(self):
@@ -289,9 +297,9 @@ class TramiteViewSet(viewsets.ModelViewSet):
         if self.action in ['list', 'create', 'retrieve', 'destroy']:
             permission_classes = [permissions.IsAuthenticated]
         elif self.action in ['update', 'partial_update']:
-            permission_classes = [IsOperatorOrAdmin]
+            permission_classes = [IsAdmin]
         else:
-            permission_classes = [IsOperatorOrAdmin]
+            permission_classes = [IsAdmin]
         return [permission() for permission in permission_classes]
 
     def destroy(self, request, *args, **kwargs):
