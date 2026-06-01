@@ -235,3 +235,8 @@ class DocumentTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = DocumentType
         fields = '__all__'
+        
+class ServiceRequirementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ServiceRequirement
+        fields = '__all__'

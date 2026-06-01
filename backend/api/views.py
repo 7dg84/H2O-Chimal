@@ -1,8 +1,9 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-from .models import Report, Document, Service, Tramite, AuditLog, Media, DocumentType
-from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UserSerializer, MediaSerializer, DocumentTypeSerializer
+from django_filters.rest_framework import DjangoFilterBackend
+from .models import Report, Document, Service, Tramite, AuditLog, Media, DocumentType, ServiceRequirement
+from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UserSerializer, MediaSerializer, DocumentTypeSerializer, ServiceRequirementSerializer
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 from django.shortcuts import get_object_or_404
@@ -359,3 +360,7 @@ class DocumentTypeViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdmin]
 
     
+class RequirementViewSet(viewsets.ModelViewSet):
+    queryset = ServiceRequirement.objects.all()
+    serializer_class = ServiceRequirementSerializer
+    permission_classes = [IsAdmin]

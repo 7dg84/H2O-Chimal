@@ -5,8 +5,9 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'replace-me')
-DEBUG = os.environ.get('DEBUG', '0') == '1' or os.environ.get('DEBUG')=='True'
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS','localhost').split(',')
+DEBUG = os.environ.get(
+    'DEBUG', '0') == '1' or os.environ.get('DEBUG') == 'True'
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -17,6 +18,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    # 'django_filters',
     'storages',
     'api',
 ]
@@ -39,7 +41,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
         'APP_DIRS': True,
-        'OPTIONS': {'context_processors': ['django.template.context_processors.debug','django.template.context_processors.request','django.contrib.auth.context_processors.auth','django.contrib.messages.context_processors.messages']},
+        'OPTIONS': {'context_processors': ['django.template.context_processors.debug', 'django.template.context_processors.request', 'django.contrib.auth.context_processors.auth', 'django.contrib.messages.context_processors.messages']},
     },
 ]
 
@@ -48,11 +50,11 @@ WSGI_APPLICATION = 'h2o.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME','h2o_db'),
-        'USER': os.environ.get('DB_USER','h2o_user'),
-        'PASSWORD': os.environ.get('DB_PASSWORD','h2o_pass'),
-        'HOST': os.environ.get('DB_HOST','localhost'),
-        'PORT': os.environ.get('DB_PORT','5432'),
+        'NAME': os.environ.get('DB_NAME', 'h2o_db'),
+        'USER': os.environ.get('DB_USER', 'h2o_user'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'h2o_pass'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
@@ -83,7 +85,8 @@ SIMPLE_JWT = {
 }
 
 # Storage (S3-compatible Ceph)
-DEFAULT_FILE_STORAGE = os.environ.get('DEFAULT_FILE_STORAGE', 'storages.backends.s3boto3.S3Boto3Storage')
+DEFAULT_FILE_STORAGE = os.environ.get(
+    'DEFAULT_FILE_STORAGE', 'storages.backends.s3boto3.S3Boto3Storage')
 AWS_ACCESS_KEY_ID = os.environ.get('CEPH_ACCESS_KEY')
 AWS_SECRET_ACCESS_KEY = os.environ.get('CEPH_SECRET_KEY')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('CEPH_BUCKET')
@@ -92,4 +95,5 @@ AWS_S3_REGION_NAME = os.environ.get('CEPH_REGION', '')
 AWS_S3_SIGNATURE_VERSION = 's3v4'
 AWS_S3_ADDRESSING_STYLE = 'path'
 # Public endpoint used to sign presigned URLs (can differ from internal endpoint)
-CEPH_PUBLIC_ENDPOINT = os.environ.get('CEPH_PUBLIC_ENDPOINT', AWS_S3_ENDPOINT_URL)
+CEPH_PUBLIC_ENDPOINT = os.environ.get(
+    'CEPH_PUBLIC_ENDPOINT', AWS_S3_ENDPOINT_URL)
