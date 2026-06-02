@@ -1,3 +1,5 @@
 .env/
 .envl/
 app/*
+.env
+/backend/.env
