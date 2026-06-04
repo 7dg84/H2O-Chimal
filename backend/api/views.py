@@ -75,6 +75,7 @@ class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.all().order_by('-reported_at')
     serializer_class = ReportSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filterset_fields = ['status', 'service_id']
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -278,6 +279,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
     permission_classes = [permissions.AllowAny]
+    filterset_fields = ['name']
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:

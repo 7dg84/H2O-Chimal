@@ -18,9 +18,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    # 'django_filters',
     'storages',
     'api',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -76,6 +76,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'api.auth.CookieTokenAuthentication',
     ),
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ]
 }
 
 # SIMPLE_JWT left in settings if needed elsewhere, but primary auth uses token cookies
