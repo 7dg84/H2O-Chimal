@@ -1,3 +1,4 @@
+import 'package:app/providers/navigation_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/config.dart';
@@ -22,6 +23,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider(authService)),
+        ChangeNotifierProvider(create: (_) => NavigationProvider())
       ],
       child: const MyApp(),
     ),
@@ -126,14 +128,15 @@ class _MainNavigationState extends State<MainNavigation> {
 
   @override
   Widget build(BuildContext context) {
+    final navProvider = context.watch<NavigationProvider>();
     return Scaffold(
       body: IndexedStack(
-        index: _selectedIndex,
+        index: navProvider.selectedIndex,
         children: _screens,
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        currentIndex: navProvider.selectedIndex,
+        onTap: (index) => navProvider.setIndex(index),
         type: BottomNavigationBarType.fixed,
         selectedItemColor: AppConfig.secondaryAzure,
         unselectedItemColor: Colors.grey,

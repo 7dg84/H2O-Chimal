@@ -3,7 +3,7 @@ from rest_framework.decorators import action, api_view, permission_classes, auth
 from rest_framework.response import Response
 # from django_filters.rest_framework import DjangoFilterBackend
 from .models import Report, Document, Service, Tramite, AuditLog, Media, DocumentType, ServiceRequirement
-from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UserSerializer, MediaSerializer, DocumentTypeSerializer, ServiceRequirementSerializer
+from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UserSerializer, MediaSerializer, DocumentTypeSerializer, ServiceRequirementSerializer, AuditLogSerializer
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 from django.shortcuts import get_object_or_404
@@ -332,7 +332,7 @@ class TramiteViewSet(viewsets.ModelViewSet):
                         return Response({'error': 'Failed to delete document from storage'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     doc.delete()
         return super().destroy(request, *args, **kwargs)
-    
+
     @action(detail=True, methods=['post'], permission_classes=[IsAdmin])
     def change_status(self, request, pk=None):
         tramite = self.get_object()
@@ -359,8 +359,14 @@ class DocumentTypeViewSet(viewsets.ModelViewSet):
     serializer_class = DocumentTypeSerializer
     permission_classes = [IsAdmin]
 
-    
+
 class RequirementViewSet(viewsets.ModelViewSet):
     queryset = ServiceRequirement.objects.all()
     serializer_class = ServiceRequirementSerializer
+    permission_classes = [IsAdmin]
+
+
+class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = AuditLog.objects.all().order_by('-created_at')
+    serializer_class = AuditLogSerializer
     permission_classes = [IsAdmin]

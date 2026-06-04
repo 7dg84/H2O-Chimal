@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppConfig {
-  static const String apiBaseUrl = 'http://192.168.0.118:8000/api'; // Change to production URL when needed
+  static const String apiBaseUrl = 'https://h2o.smart-food.cc/api'; // Change to production URL when needed
   
   // Institutional Colors
   static const Color primaryBlue = Color(0xFF003366); // Deep Institutional Blue

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Report, Document, Service, DocumentType, Tramite, Media
+from .models import User, Report, Document, Service, DocumentType, Tramite, Media, AuditLog
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.core.files.storage import default_storage
@@ -240,3 +240,9 @@ class ServiceRequirementSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceRequirement
         fields = '__all__'
+        
+class AuditLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AuditLog
+        fields = '__all__'
+        read_only_fields = '__all__'

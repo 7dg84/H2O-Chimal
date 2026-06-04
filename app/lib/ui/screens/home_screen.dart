@@ -1,3 +1,4 @@
+import 'package:app/providers/navigation_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/config.dart';
@@ -41,6 +42,7 @@ class HomeScreen extends StatelessWidget {
             GestureDetector(
               onTap: () {
                 // Navigate to report form
+                Navigator.pushNamed(context, '/report-fuga');
               },
               child: Container(
                 width: double.infinity,
@@ -80,7 +82,9 @@ class HomeScreen extends StatelessWidget {
                   child: _buildQuickAction(
                     icon: Icons.plumbing,
                     label: 'Servicios',
-                    onTap: () {},
+                    onTap: () {
+                      context.read<NavigationProvider>().setIndex(2); // Cambia a la pestaña de Servicios (índice 2)
+                    },
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -88,21 +92,27 @@ class HomeScreen extends StatelessWidget {
                   child: _buildQuickAction(
                     icon: Icons.map_outlined,
                     label: 'Zonas',
-                    onTap: () {},
+                    onTap: () {
+                      context.read<NavigationProvider>().setIndex(1); // Cambia a la pestaña de Mapa (índice 1)
+                    },
                   ),
                 ),
               ],
             ),
             
             const SizedBox(height: 40),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   'Mis Reportes Activos',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppConfig.primaryBlue),
                 ),
-                Text('Ver todos', style: TextStyle(color: AppConfig.secondaryAzure)),
+                TextButton(onPressed: () {
+                  context.read<NavigationProvider>().setIndex(3); // Cambia a la pestaña de Usuario (índice 3)
+                },
+                    child: const Text('Ver todos', style: TextStyle(color: AppConfig.secondaryAzure)),
+                ),
               ],
             ),
             const SizedBox(height: 16),

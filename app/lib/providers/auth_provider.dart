@@ -42,6 +42,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  // En lib/providers/auth_provider.dart
   Future<bool> register({
     required String email,
     required String password,
@@ -57,18 +58,19 @@ class AuthProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      _user = await _authService.register(
-        email: email,
-        password: password,
-        curp: curp,
-        name: name,
-        phone: phone,
-        postalCode: postalCode,
-        colonia: colonia,
-        street: street,
-        block: block,
-        exteriorNumber: exteriorNumber,
-      );
+      // CAMBIO AQUÍ: Encerrar todo en llaves {} para crear el Map que espera AuthService
+      _user = await _authService.register({
+        'email': email,
+        'password': password,
+        'curp': curp,
+        'name': name,
+        'phone': phone,
+        'postal_code': postalCode,
+        'colonia': colonia,
+        'street': street,
+        'block': block,
+        'exterior_number': exteriorNumber,
+      });
       _isLoading = false;
       notifyListeners();
       return true;

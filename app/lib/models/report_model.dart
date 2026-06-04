@@ -1,6 +1,7 @@
-import '../core/config.dart';
 import 'package:flutter/material.dart';
+import '../core/config.dart';
 
+// 1. El enum DEBE estar definido aquí, fuera de la clase.
 enum ReportStatus { recibido, enRevision, enAtencion, resuelto, cerrado }
 
 class ReportModel {
@@ -12,8 +13,9 @@ class ReportModel {
   final String locationText;
   final String reportType;
   final String description;
-  final ReportStatus status;
+  final ReportStatus status; // Aquí se usa el enum
   final String? assignedOperatorId;
+  final List<String> media;
 
   ReportModel({
     required this.id,
@@ -26,13 +28,14 @@ class ReportModel {
     required this.description,
     required this.status,
     this.assignedOperatorId,
+    this.media = const [],
   });
 
   factory ReportModel.fromJson(Map<String, dynamic> json) {
     return ReportModel(
       id: json['id'],
-      folio: json['folio'],
-      reportedAt: DateTime.parse(json['reported_at'] ?? json['created_at']),
+      folio: json['folio'].toString(),
+      reportedAt: DateTime.parse(json['reported_at']),
       latitude: double.parse(json['latitude'].toString()),
       longitude: double.parse(json['longitude'].toString()),
       locationText: json['location_text'] ?? '',
@@ -40,9 +43,11 @@ class ReportModel {
       description: json['description'] ?? '',
       status: _parseStatus(json['status']),
       assignedOperatorId: json['assigned_operator_id'],
+      media: List<String>.from(json['media'] ?? []),
     );
   }
 
+  // 2. Este método estático mapea los strings de la API al Enum
   static ReportStatus _parseStatus(String? status) {
     switch (status) {
       case 'En revisión':

@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import '../models/user_model.dart';
 import 'api_service.dart';
 
@@ -8,55 +7,17 @@ class AuthService {
   AuthService(this._apiService);
 
   Future<UserModel> login(String email, String password) async {
-    try {
-      final response = await _apiService.post('/auth/login/', data: {
-        'email': email,
-        'password': password,
-      });
-      return UserModel.fromJson(response.data['user'] ?? response.data);
-    } catch (e) {
-      rethrow;
-    }
-  }
+    // 1. Intentar login
+    final response = await _apiService.post('/auth/login/', data: {
+      'email': email,
+      'password': password,
+    });
 
-  Future<UserModel> register({
-    required String email,
-    required String password,
-    required String curp,
-    required String name,
-    required String phone,
-    required String postalCode,
-    required String colonia,
-    required String street,
-    String? block,
-    String? exteriorNumber,
-  }) async {
-    try {
-      final response = await _apiService.post('/auth/register/', data: {
-        'email': email,
-        'password': password,
-        'curp': curp,
-        'name': name,
-        'phone': phone,
-        'postal_code': postalCode,
-        'colonia': colonia,
-        'street': street,
-        'block': block,
-        'exterior_number': exteriorNumber,
-      });
-      print(response.data);
-      return UserModel.fromJson(response.data);
-    } catch (e) {
-      print(e);
-      rethrow;
-    }
-  }
-
-  Future<void> logout() async {
-    try {
-      await _apiService.post('/auth/logout/');
-    } catch (e) {
-      rethrow;
+    if (response.data['succes'] == 'ok' || response.statusCode == 200) {
+      // 2. Si el login es exitoso, obtenemos los datos del usuario (la cookie ya está guardada)
+      return await getCurrentUser() ?? (throw Exception("No se pudo obtener el perfil"));
+    } else {
+      throw Exception("Credenciales inválidas");
     }
   }
 
@@ -67,5 +28,18 @@ class AuthService {
     } catch (e) {
       return null;
     }
+  }
+
+  // El registro devuelve id y email, podemos usar eso para crear un UserModel parcial o llamar a user/
+  Future<UserModel> register(Map<String, dynamic> data) async {
+    final response = await _apiService.post('/auth/register/', data: data);
+    if (response.statusCode == 201) {
+      return await getCurrentUser() ?? UserModel.fromJson(response.data);
+    }
+    throw Exception("Error en el registro");
+  }
+
+  Future<void> logout() async {
+    await _apiService.post('/auth/logout/');
   }
 }
