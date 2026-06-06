@@ -12,9 +12,8 @@ from .auth import CookieTokenAuthentication
 from .permissions import IsOperator, IsAdmin, IsOperatorOrAdmin
 from h2o.storage_backends import MediaStorage, DocumentStorage
 from django.core.exceptions import ValidationError
-from .filters import ReportFilter, ServiceFilter
+from .filters import ReportFilter, ServiceFilter, MediaFilter, TramiteFilter, DocumentFilter,ServiceRequirementFilter, AuditLogFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
 
 
 class RegisterView(viewsets.GenericViewSet):
@@ -78,12 +77,10 @@ class ReportViewSet(viewsets.ModelViewSet):
     serializer_class = ReportSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    # Filters and search
     filterset_class = ReportFilter
-    filter_backends = [DjangoFilterBackend,
-                       filters.SearchFilter,
-                       filters.OrderingFilter,
-                       ]
-    search_fields = ['folio', 'description', 'location_text']
+    search_fields = ['folio', 'description', 'location_text', 'user__curp']
+    ordering_fields = ['reported_at', 'folio', 'status', 'estimared_time_interval']
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -170,6 +167,11 @@ class MediaViewSet(viewsets.ModelViewSet):
     serializer_class = MediaSerializer
     permission_classes = [permissions.IsAuthenticated]
     storage = MediaStorage()
+    
+    # Filters and search
+    filterset_class = MediaFilter
+    search_fields = ['filename', 'report__user__curp', 'report__location_text']
+    ordering_fields = ['uploaded_at', 'filename', 'mime_type']
 
     def create(self, request, *args, **kwargs):
         # Accept file upload or storage_key
@@ -229,6 +231,11 @@ class DocumentViewSet(viewsets.ModelViewSet):
     serializer_class = DocumentSerializer
     permission_classes = [permissions.IsAuthenticated]
     storage = DocumentStorage()
+    
+    # Filters and search
+    filterset_class = DocumentFilter
+    search_fields = ['user__curp', 'tramite__folio', 'document_type__name', 'filename']
+    ordering_fields = ['uploaded_at', 'document_type', 'mime_type', 'size']
 
     def create(self, request, *args, **kwargs):
         # Accept file upload or storage_key
@@ -284,16 +291,14 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
-    queryset = Service.objects.all()
+    queryset = Service.objects.all().order_by('name')
     serializer_class = ServiceSerializer
     permission_classes = [permissions.AllowAny]
     
+    # Filters and search
     filterset_class = ServiceFilter
-    filter_backends = [DjangoFilterBackend,
-                       filters.SearchFilter,
-                       filters.OrderingFilter,
-                       ]
     search_fields = ['name', 'description']
+    ordering_fields = ['name', 'response_time']
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
@@ -307,6 +312,11 @@ class TramiteViewSet(viewsets.ModelViewSet):
     queryset = Tramite.objects.all().order_by('-created_at')
     serializer_class = TramiteSerializer
     permission_classes = [permissions.IsAuthenticated]
+    
+    # Filters and search
+    filterset_class = TramiteFilter
+    search_fields = ['user__curp', 'service__name', 'folio']
+    ordering_fields = ['folio', 'created_at', 'status']
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -371,18 +381,32 @@ class TramiteViewSet(viewsets.ModelViewSet):
 
 # Admin views
 class DocumentTypeViewSet(viewsets.ModelViewSet):
-    queryset = DocumentType.objects.all()
+    queryset = DocumentType.objects.all().order_by('name')
     serializer_class = DocumentTypeSerializer
     permission_classes = [IsAdmin]
+    
+    # Filters and search
+    search_fields = ['name', 'description']
+    ordering_fields = ['name']
 
 
 class RequirementViewSet(viewsets.ModelViewSet):
-    queryset = ServiceRequirement.objects.all()
+    queryset = ServiceRequirement.objects.all().order_by('service', 'document_type')
     serializer_class = ServiceRequirementSerializer
     permission_classes = [IsAdmin]
+    
+    # Filters and search
+    filterset_class = ServiceRequirementFilter
+    search_fields = ['notes', 'service__name', 'document_type__name']
+    ordering_fields = ['service__name', 'document_type__name', 'required']
 
 
 class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = AuditLog.objects.all().order_by('-created_at')
     serializer_class = AuditLogSerializer
     permission_classes = [IsAdmin]
+    
+    # Filters and search
+    filterset_class = AuditLogFilter
+    search_fields = ['user__email', 'action', 'target_type', 'target_id']
+    ordering_fields = ['created_at', 'action']
