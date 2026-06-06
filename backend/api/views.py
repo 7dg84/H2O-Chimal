@@ -1,7 +1,6 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-# from django_filters.rest_framework import DjangoFilterBackend
 from .models import Report, Document, Service, Tramite, AuditLog, Media, DocumentType, ServiceRequirement
 from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UserSerializer, MediaSerializer, DocumentTypeSerializer, ServiceRequirementSerializer, AuditLogSerializer
 from django.contrib.auth import get_user_model
@@ -13,6 +12,9 @@ from .auth import CookieTokenAuthentication
 from .permissions import IsOperator, IsAdmin, IsOperatorOrAdmin
 from h2o.storage_backends import MediaStorage, DocumentStorage
 from django.core.exceptions import ValidationError
+from .filters import ReportFilter, ServiceFilter
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 
 class RegisterView(viewsets.GenericViewSet):
@@ -75,7 +77,13 @@ class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.all().order_by('-reported_at')
     serializer_class = ReportSerializer
     permission_classes = [permissions.IsAuthenticated]
-    filterset_fields = ['status', 'service_id']
+
+    filterset_class = ReportFilter
+    filter_backends = [DjangoFilterBackend,
+                       filters.SearchFilter,
+                       filters.OrderingFilter,
+                       ]
+    search_fields = ['folio', 'description', 'location_text']
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -279,7 +287,13 @@ class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
     permission_classes = [permissions.AllowAny]
-    filterset_fields = ['name']
+    
+    filterset_class = ServiceFilter
+    filter_backends = [DjangoFilterBackend,
+                       filters.SearchFilter,
+                       filters.OrderingFilter,
+                       ]
+    search_fields = ['name', 'description']
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
