@@ -77,45 +77,49 @@ Get:
 ```json
 Request:
 response:
-[
-  {
-    "id": "b9f68bf3-27b6-4b42-9f76-146031e7aa35",
-    "media": [
-      "a8366a87-b295-42a8-a781-ef3d28e4bd99"
-    ],
-    "folio": 15,
-    "reported_at": "2026-05-24T09:01:54.344187-06:00",
-    "latitude": "1.0000000",
-    "longitude": "1.0000000",
-    "location_text": "colonia, calle, manzana, numero",
-    "report_type": "superficial",
-    "description": "descripcion",
-    "status": "Recibido",
-    "assigned_operator_id": null,
-    "estimated_time_interval": "",
-    "user": "f10104e3-1f91-40ad-8f23-e870ccdcbada"
-  }
-]
+{
+  "count": 1,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": "c39824c4-9425-48e5-a941-3ce60dd72a2e",
+      "media": [],
+      "folio": 1,
+      "reported_at": "2026-06-06T18:51:17.777227-06:00",
+      "latitude": "1.0000000",
+      "longitude": "1.0000000",
+      "location_text": "colonia, calle, manzana, numero",
+      "report_type": "superficial",
+      "description": "descripcion",
+      "status": "Recibido",
+      "notes": "",
+      "assigned_operator_id": null,
+      "estimated_time_interval": "",
+      "user": "532afeca-ff77-4f04-a5c3-1677d4b4b45c"
+    }
+  ]
+}
 ```
 Get:
 ```json
-Request: /api/reports/b9f68bf3-27b6-4b42-9f76-146031e7aa35/
-Response: {
-  "id": "b9f68bf3-27b6-4b42-9f76-146031e7aa35",
-  "media": [
-      "a8366a87-b295-42a8-a781-ef3d28e4bd99"
-    ],
-  "folio": 15,
-  "reported_at": "2026-05-24T09:01:54.344187-06:00",
+Request: /api/reports/c39824c4-9425-48e5-a941-3ce60dd72a2e/
+Response: 
+{
+  "id": "c39824c4-9425-48e5-a941-3ce60dd72a2e",
+  "media": [],
+  "folio": 1,
+  "reported_at": "2026-06-06T18:51:17.777227-06:00",
   "latitude": "1.0000000",
   "longitude": "1.0000000",
   "location_text": "colonia, calle, manzana, numero",
   "report_type": "superficial",
   "description": "descripcion",
   "status": "Recibido",
+  "notes": "",
   "assigned_operator_id": null,
   "estimated_time_interval": "",
-  "user": "f10104e3-1f91-40ad-8f23-e870ccdcbada"
+  "user": "532afeca-ff77-4f04-a5c3-1677d4b4b45c"
 }
 ```
 Post:
@@ -130,21 +134,20 @@ Request:
 }
 response:
 {
-  "id": "b9f68bf3-27b6-4b42-9f76-146031e7aa35",
-  "media": [
-      "a8366a87-b295-42a8-a781-ef3d28e4bd99"
-    ],
-  "folio": 15,
-  "reported_at": "2026-05-24T09:01:54.344187-06:00",
+  "id": "c39824c4-9425-48e5-a941-3ce60dd72a2e",
+  "media": [],
+  "folio": 1,
+  "reported_at": "2026-06-06T18:51:17.777227-06:00",
   "latitude": "1.0000000",
   "longitude": "1.0000000",
   "location_text": "colonia, calle, manzana, numero",
   "report_type": "superficial",
   "description": "descripcion",
   "status": "Recibido",
+  "notes": "",
   "assigned_operator_id": null,
   "estimated_time_interval": "",
-  "user": "f10104e3-1f91-40ad-8f23-e870ccdcbada"
+  "user": "532afeca-ff77-4f04-a5c3-1677d4b4b45c"
 }
 ```
 Put:
@@ -180,7 +183,7 @@ Delete:
 ```json
 Request: /api/reports/b9f68bf3-27b6-4b42-9f76-146031e7aa35/
 response:
-
+204
 ```
 ## media: '/api/media/'
 Get:
@@ -233,35 +236,48 @@ Delete:
 ```json
 Request: /api/media/a8366a87-b295-42a8-a781-ef3d28e4bd99/
 response:
-
+204
 ```
 ## services: '/api/services/'
 Get:
 ```json
 Request:
 response:
-[
-  {
-    "id": "04be0139-e61d-4ca0-afee-ce987b5a7845",
-    "requirements": [
-      {
-        "document_type_id": "66f80579-3d55-45ae-905e-2c5b9f09b794",
-        "document_type_name": "INE",
-        "required": true,
-        "notes": ""
-      },
-      {
-        "document_type_id": "559c494d-2d8b-4a6e-b3f6-89cd729f885f",
-        "document_type_name": "Contrado Odapas",
-        "required": true,
-        "notes": ""
-      }
-    ],
-    "name": "pipa",
-    "description": "llevar una pipa",
-    "response_time": "2h"
-  }
-]
+{
+  "count": 2,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": "6e9208ac-6d04-4907-a00d-ae64f970cb82",
+      "requirements": [
+        {
+          "document_type_id": "0108f337-00b1-4783-8eec-a03d88aadad4",
+          "document_type_name": "INE",
+          "required": true,
+          "notes": ""
+        }
+      ],
+      "name": "Conexión a Red",
+      "description": "Conecta una toma a la red de agua.",
+      "response_time": "48h"
+    },
+    {
+      "id": "17a2ba79-1b8c-4968-8407-791227e6c45e",
+      "requirements": [
+        {
+          "document_type_id": "0108f337-00b1-4783-8eec-a03d88aadad4",
+          "document_type_name": "INE",
+          "required": true,
+          "notes": ""
+        }
+      ],
+      "name": "pipa",
+      "description": "Solicitud de pipa de agua",
+      "response_time": "2h"
+    }
+  ]
+}
 ```
 Get:
 ```json
@@ -320,23 +336,33 @@ Get:
 ```json
 Request:
 response:
-[
-  {
-    "id": "54d6032e-ba1b-43d3-b8fa-795348fd38f8",
-    "documents": [
-      {
-        "id": "1d33794a-9a1e-432b-9907-c56c544d6dae",
-        "filename": "img.jpg"
-      }
-    ],
-    "folio": 18,
-    "created_at": "2026-05-24T14:56:53.924019-06:00",
-    "status": "Creado",
-    "notes": "",
-    "user": "f10104e3-1f91-40ad-8f23-e870ccdcbada",
-    "service": "04be0139-e61d-4ca0-afee-ce987b5a7845"
-  }
-]
+{
+  "count": 2,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": "4e61cee8-1abf-4370-9483-f8b00732798b",
+      "documents": [],
+      "service": "17a2ba79-1b8c-4968-8407-791227e6c45e",
+      "folio": 2,
+      "created_at": "2026-06-06T22:19:05.153006-06:00",
+      "status": "Creado",
+      "notes": "",
+      "user": "532afeca-ff77-4f04-a5c3-1677d4b4b45c"
+    },
+    {
+      "id": "0b06d10e-d30a-491f-8690-a8b4ce2a99b4",
+      "documents": [],
+      "service": "17a2ba79-1b8c-4968-8407-791227e6c45e",
+      "folio": 1,
+      "created_at": "2026-06-06T22:18:38.749718-06:00",
+      "status": "Creado",
+      "notes": "",
+      "user": "532afeca-ff77-4f04-a5c3-1677d4b4b45c"
+    }
+  ]
+}
 ```
 Get: 
 ```json

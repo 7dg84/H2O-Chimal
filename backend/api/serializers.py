@@ -212,6 +212,7 @@ class ServiceSerializer(serializers.ModelSerializer):
 
 class TramiteSerializer(serializers.ModelSerializer):
     documents = serializers.SerializerMethodField(read_only=True)
+    service = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), required=True)
     class Meta:
         model = Tramite
         fields = '__all__'
@@ -224,6 +225,8 @@ class TramiteSerializer(serializers.ModelSerializer):
         validated_data.pop('notes', None)  # Ensure created_at is not set by client
         user = self.context['request'].user
         validated_data['user'] = user
+        if 'service' not in validated_data: # service is required on create
+            raise serializers.ValidationError({'service': 'Este campo es requerido.'})
         return super().create(validated_data)
     
     def get_documents(self, obj):
