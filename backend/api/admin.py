@@ -1,10 +1,9 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from .models import User, Service, DocumentType, ServiceRequirement, Report, Document, Media, Tramite, AuditLog
 
 
 @admin.register(User)
-class UserAdmin(DjangoUserAdmin):
+class UserAdmin(admin.ModelAdmin):
     model = User
     list_display = ('email','name','curp','role','is_staff','is_superuser')
     search_fields = ('email','name','curp')
