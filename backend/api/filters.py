@@ -62,6 +62,16 @@ class ServiceRequirementFilter(django_filters.FilterSet):
         fields = {'required': ['exact'],
                   'service': ['exact'],
                   'document_type': ['exact']}
+        
+class ReportCoordinateFilter(django_filters.FilterSet):
+    class Meta:
+        model = Report
+        fields = {
+            'status': ['exact'],
+            'latitude': ['exact', 'gte', 'lte', 'range'],
+            'longitude': ['exact', 'gte', 'lte', 'range'],
+        }
+        
 class AuditLogFilter(django_filters.FilterSet):
     class Meta:
         model = AuditLog

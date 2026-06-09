@@ -2,7 +2,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
 from .models import Report, Document, Service, Tramite, AuditLog, Media, DocumentType, ServiceRequirement
-from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UserSerializer, MediaSerializer, DocumentTypeSerializer, ServiceRequirementSerializer, AuditLogSerializer
+from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UserSerializer, MediaSerializer, DocumentTypeSerializer, ServiceRequirementSerializer, ReportsCoordinatesSerializer, AuditLogSerializer
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 from django.shortcuts import get_object_or_404
@@ -12,7 +12,7 @@ from .auth import CookieTokenAuthentication
 from .permissions import IsOperator, IsAdmin, IsOperatorOrAdmin
 from h2o.storage_backends import MediaStorage, DocumentStorage
 from django.core.exceptions import ValidationError
-from .filters import ReportFilter, ServiceFilter, MediaFilter, TramiteFilter, DocumentFilter,ServiceRequirementFilter, AuditLogFilter
+from .filters import ReportFilter, ServiceFilter, MediaFilter, TramiteFilter, DocumentFilter,ServiceRequirementFilter, ReportCoordinateFilter, AuditLogFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
 
@@ -399,6 +399,20 @@ class RequirementViewSet(viewsets.ModelViewSet):
     filterset_class = ServiceRequirementFilter
     search_fields = ['notes', 'service__name', 'document_type__name']
     ordering_fields = ['service__name', 'document_type__name', 'required']
+    
+    
+class ReportCoordinateViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Report.objects.filter(latitude__isnull=False, longitude__isnull=False, status__in=['Recibido', 'En revisión', 'En atención']).order_by('-reported_at').only('id', 'latitude', 'longitude', 'status')
+    serializer_class = ReportsCoordinatesSerializer
+    permission_classes = [permissions.AllowAny]
+    
+    # Filters and search
+    filterset_class = ReportCoordinateFilter
+    ordering_fields = ['reported_at', 'latitide', 'longitude', 'estimated_time_interval']
+    
+    # max 20 
+    max_page_size = 20
+    page_size = 20
 
 
 class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):

@@ -82,8 +82,11 @@ class Report(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     folio = models.PositiveBigIntegerField(unique=True, editable=False)
     reported_at = models.DateTimeField(auto_now_add=True)
-    latitude = models.DecimalField(max_digits=10, decimal_places=7, null=False, blank=False)
-    longitude = models.DecimalField(max_digits=10, decimal_places=7, null=False, blank=False)
+    # Increase precision to allow more decimal places from client coordinates
+    # `max_digits` counts all digits (before+after decimal).
+    # Using 14 total digits with 10 decimal places is sufficient for GPS coords.
+    latitude = models.DecimalField(max_digits=14, decimal_places=10, null=False, blank=False)
+    longitude = models.DecimalField(max_digits=14, decimal_places=10, null=False, blank=False)
     location_text = models.CharField(max_length=300, blank=False)
     report_type = models.CharField(max_length=50, choices=REPORT_TYPES, blank=False)
     description = models.TextField(blank=False)

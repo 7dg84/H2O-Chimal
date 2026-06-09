@@ -244,6 +244,12 @@ class ServiceRequirementSerializer(serializers.ModelSerializer):
         model = ServiceRequirement
         fields = '__all__'
         
+# View active reports for the map
+class ReportsCoordinatesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Report
+        fields = ['id', 'latitude', 'longitude', 'report_type'] 
+
 class AuditLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = AuditLog

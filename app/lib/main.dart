@@ -1,4 +1,6 @@
 import 'package:app/providers/navigation_provider.dart';
+import 'package:app/providers/report_provider.dart';
+import 'package:app/services/report_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/config.dart';
@@ -18,12 +20,14 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   final apiService = ApiService();
   final authService = AuthService(apiService);
+  final reportService = ReportService(apiService);
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider(authService)),
-        ChangeNotifierProvider(create: (_) => NavigationProvider())
+        ChangeNotifierProvider(create: (_) => NavigationProvider()),
+        ChangeNotifierProvider(create: (_) => ReportProvider(reportService)),
       ],
       child: const MyApp(),
     ),
@@ -111,20 +115,12 @@ class MainNavigation extends StatefulWidget {
 }
 
 class _MainNavigationState extends State<MainNavigation> {
-  int _selectedIndex = 0;
-  
   final List<Widget> _screens = [
     const HomeScreen(),
     const MapScreen(),
     const ServicesScreen(),
     const ProfileScreen(),
   ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {

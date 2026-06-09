@@ -8,16 +8,28 @@ class ReportService {
 
   ReportService(this._apiService);
 
+  Future<List<ReportModel>> getRecentReports({int limit = 2}) async {
+    try {
+      final response = await _apiService.get('/reports/', queryParameters: {
+        'limit': limit,
+        'ordering': '-reported_at',
+      });
+      
+      final List<dynamic> results = response.data['results'] ?? [];
+      return results.map((json) => ReportModel.fromJson(json)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<ReportModel> createReport({
     required double latitude,
     required double longitude,
     required String locationText,
     required String reportType,
     required String description,
-    File? imageFile, // Aceptamos el archivo de imagen
   }) async {
     try {
-      // 1. Crear el reporte (datos de texto)
       final response = await _apiService.post('/reports/', data: {
         'latitude': latitude.toString(),
         'longitude': longitude.toString(),
@@ -26,25 +38,15 @@ class ReportService {
         'description': description,
       });
 
-      final report = ReportModel.fromJson(response.data);
-
-      // 2. Si el usuario seleccionó una imagen, la subimos vinculada al reporte
-      if (imageFile != null) {
-        await _uploadMedia(report.id, imageFile);
-      }
-
-      return report;
+      return ReportModel.fromJson(response.data);
     } catch (e) {
       rethrow;
     }
   }
 
-  // Método privado para subir la multimedia al endpoint /api/media/
-  Future<void> _uploadMedia(String reportId, File file) async {
+  Future<void> uploadMedia(String reportId, File file) async {
     try {
       String fileName = file.path.split('/').last;
-
-      // Creamos el FormData según lo que pide el curl de tu ejemplo
       FormData formData = FormData.fromMap({
         'report': reportId,
         'file': await MultipartFile.fromFile(
@@ -55,8 +57,7 @@ class ReportService {
 
       await _apiService.post('/media/', data: formData);
     } catch (e) {
-      // Loggear el error de subida de imagen pero el reporte ya fue creado
-      print("Error subiendo imagen: $e");
+      rethrow;
     }
   }
 }
