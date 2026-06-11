@@ -19,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=8)
+    password = serializers.CharField(write_only=True, min_length=8, required=False)
 
     class Meta:
         model = get_user_model()
@@ -56,10 +56,55 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {'postal_code': 'Código postal inválido'})
 
-        password = validated_data.pop('password')
+        password = validated_data.pop('password', None)
+        if not password:
+            raise serializers.ValidationError({'password': 'Password requerido'})
         # Use the custom manager to create the user (handles password properly)
         user = get_user_model().objects.create_user(**validated_data, password=password)
         return user
+    
+    def update(self, instance, validated_data):
+        # Required fields check
+        phone = validated_data.get('phone')
+        curp = validated_data.get('curp')
+        postal_code = validated_data.get('postal_code')
+
+        if not phone:
+            raise serializers.ValidationError(
+                {'phone': 'Número de teléfono requerido'})
+        if not curp:
+            raise serializers.ValidationError({'curp': 'CURP requerida'})
+        if not postal_code:
+            raise serializers.ValidationError(
+                {'postal_code': 'Código postal requerido'})
+
+        # Validate phone number
+        if not phone.isdigit() or len(phone) != 10:
+            raise serializers.ValidationError(
+                {'phone': 'Número de teléfono inválido'})
+
+        # Validate CURP format
+        curp_pattern = r'^[A-Z]{4}\d{6}[HM][A-Z]{5}[0-9A-Z]\d$'
+        if not re.match(curp_pattern, curp):
+            raise serializers.ValidationError({'curp': 'CURP inválida'})
+
+        # validate postal code
+        if not postal_code.isdigit() or len(postal_code) != 5:
+            raise serializers.ValidationError(
+                {'postal_code': 'Código postal inválido'})
+
+        # Handle password if provided
+        password = validated_data.pop('password', None)
+
+        # Update simple fields on the instance
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        if password:
+            instance.set_password(password)
+
+        instance.save()
+        return instance
 
 
 class ReportSerializer(serializers.ModelSerializer):

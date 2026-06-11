@@ -31,6 +31,13 @@ class RegisterView(viewsets.GenericViewSet):
         response.set_cookie(key='auth_token', value=token.key,
                             httponly=True, samesite='Lax', max_age=86400*30)
         return response
+    
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def update_info(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.update(request.user, serializer.validated_data)
+        return Response({'id': user.id, 'email': user.email}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
