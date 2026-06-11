@@ -8,6 +8,7 @@ import os
 import boto3
 from .models import ServiceRequirement
 from h2o.storage_backends import MediaStorage, DocumentStorage
+from botocore.client import Config
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -121,6 +122,22 @@ class MediaSerializer(serializers.ModelSerializer):
                 client = storage.connection.meta.client
         except Exception:
             return None
+
+        try:
+            # Ensure path-style addressing so public endpoint with path prefixes works
+            # If we created a client using endpoint (above), regenerate it with path addressing
+            if endpoint:
+                client = boto3.client('s3',
+                    endpoint_url=endpoint,
+                    aws_access_key_id=getattr(settings, 'AWS_ACCESS_KEY_ID', os.environ.get('CEPH_ACCESS_KEY')),
+                    aws_secret_access_key=getattr(settings, 'AWS_SECRET_ACCESS_KEY', os.environ.get('CEPH_SECRET_KEY')),
+                    region_name=getattr(settings, 'AWS_S3_REGION_NAME', os.environ.get('CEPH_REGION')),
+                    config=Config(s3={'addressing_style': 'path'})
+                )
+
+            return client.generate_presigned_url('get_object', Params={'Bucket': bucket, 'Key': obj.storage_key}, ExpiresIn=3600)
+        except Exception:
+            return None
         
     def create(self, validated_data):
         # validate if the report belongs to the user (if citizen) or is assigned to the operator (if operator)
@@ -169,6 +186,21 @@ class DocumentSerializer(serializers.ModelSerializer):
                 )
             else:
                 client = storage.connection.meta.client
+        except Exception:
+            return None
+        
+        try:
+            # Ensure path-style addressing so public endpoint with path prefixes works
+            # If we created a client using endpoint (above), regenerate it with path addressing
+            if endpoint:
+                client = boto3.client('s3',
+                    endpoint_url=endpoint,
+                    aws_access_key_id=getattr(settings, 'AWS_ACCESS_KEY_ID', os.environ.get('CEPH_ACCESS_KEY')),
+                    aws_secret_access_key=getattr(settings, 'AWS_SECRET_ACCESS_KEY', os.environ.get('CEPH_SECRET_KEY')),
+                    region_name=getattr(settings, 'AWS_S3_REGION_NAME', os.environ.get('CEPH_REGION')),
+                    config=Config(s3={'addressing_style': 'path'})
+                )
+
             return client.generate_presigned_url('get_object', Params={'Bucket': bucket, 'Key': obj.storage_key}, ExpiresIn=3600)
         except Exception:
             return None

@@ -9,18 +9,18 @@ class TramiteService {
   Future<List<TramiteModel>> getTramites() async {
     try {
       final response = await _apiService.get('/tramites/');
-      final List<dynamic> data = response.data;
-      return data.map((json) => TramiteModel.fromJson(json)).toList();
+      // Manejar respuesta paginada { "count": X, "results": [...] }
+      final List<dynamic> results = response.data['results'] ?? [];
+      return results.map((json) => TramiteModel.fromJson(json)).toList();
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<TramiteModel> createTramite(String serviceId, Map<String, dynamic> documents) async {
+  Future<TramiteModel> createTramite(String serviceId) async {
     try {
       final response = await _apiService.post('/tramites/', data: {
         'service': serviceId,
-        'documents': documents,
       });
       return TramiteModel.fromJson(response.data);
     } catch (e) {

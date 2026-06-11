@@ -23,8 +23,10 @@ class TramiteModel {
   factory TramiteModel.fromJson(Map<String, dynamic> json) {
     return TramiteModel(
       id: json['id'],
-      folio: json['folio'],
-      serviceName: json['service_name'] ?? json['service']['name'],
+      folio: json['folio'].toString(),
+      // El service puede venir como objeto o solo el ID dependiendo del endpoint, 
+      // manejamos ambos casos si es posible o usamos un valor por defecto.
+      serviceName: json['service_name'] ?? (json['service'] is Map ? json['service']['name'] : 'Servicio'),
       createdAt: DateTime.parse(json['created_at']),
       status: _parseStatus(json['status']),
       notes: json['notes'],

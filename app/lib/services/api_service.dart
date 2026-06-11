@@ -40,4 +40,8 @@ class ApiService {
   Future<Response> delete(String path) async {
     return await _dio.delete(path);
   }
+
+  Future<Response> put(String path, {dynamic data, Options? options}) async {
+    return await _dio.put(path, data: data, options: options);
+  }
 }

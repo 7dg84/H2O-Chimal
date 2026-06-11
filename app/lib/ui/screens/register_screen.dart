@@ -132,7 +132,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: _buildTextField('Manzana (Opcional)', _blockController, null, validator: (v) => null)),
+                  Expanded(child: _buildTextField('Manzana', _blockController, null)),
                   const SizedBox(width: 16),
                   Expanded(child: _buildTextField('Número exterior', _exteriorNumberController, null)),
                 ],

@@ -20,6 +20,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   final List<File> _images = []; // Lista para múltiples imágenes
   final _descriptionController = TextEditingController();
   late TextEditingController _locationController;
+  bool _initialized = false;
 
   // Coordenadas iniciales (Chimalhuacán)
   double _latitude = 19.4184;
@@ -31,6 +32,23 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     {'label': 'Toma dom.', 'value': 'domiciliaria'},
     {'label': 'Drenaje', 'value': 'obstruido'},
   ];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Capturamos los argumentos solo una vez al iniciar
+    if (!_initialized) {
+      final args = ModalRoute.of(context)?.settings.arguments as Map<String, double>?;
+      if (args != null) {
+        setState(() {
+          _latitude = args['latitude'] ?? _latitude;
+          _longitude = args['longitude'] ?? _longitude;
+        });
+      }
+      _initialized = true;
+    }
+  }
 
   @override
   void initState() {
@@ -78,6 +96,12 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   }
 
   void _handleSendReport() async {
+    if (_latitude == 19.4184 && _longitude == -98.9452) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor selecciona una ubicación en el mapa')),
+      );
+      return;
+    }
     if (_selectedType == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor selecciona un tipo de fuga')),
@@ -91,6 +115,21 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
       );
       return;
     }
+
+    if (_descriptionController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor escribe la descripcion')),
+      );
+      return;
+    }
+
+    if (_images.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor agrega al menos una imagen')),
+      );
+      return;
+    }
+
 
     final reportProvider = context.read<ReportProvider>();
 
@@ -139,22 +178,47 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
 
                   _buildSectionTitle('Ubicación en Mapa'),
                   const SizedBox(height: 16),
-                  Container(
-                    height: 150,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: Colors.grey[200],
-                    ),
-                    child: Center(
-                      child: ElevatedButton.icon(
-                        onPressed: isLoading ? null : _openMapPicker,
-                        icon: const Icon(Icons.map),
-                        label: const Text('Ajustar ubicación en mapa'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: AppConfig.primaryBlue,
-                        ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      height: 180,
+                      child: Stack(
+                        children: [
+                          FlutterMap(
+                            options: MapOptions(
+                              initialCenter: LatLng(_latitude, _longitude),
+                              initialZoom: 15,
+                            ),
+                            children: [
+                              TileLayer(urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'),
+                              MarkerLayer(
+                                markers: [
+                                  Marker(
+                                    point: LatLng(_latitude, _longitude),
+                                    width: 40,
+                                    height: 40,
+                                    child: const Icon(Icons.location_on, color: Colors.blue, size: 40),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Positioned(
+                            bottom: 12,
+                            right: 12,
+                            child: ElevatedButton.icon(
+                              onPressed: _openMapPicker,
+                              icon: const Icon(Icons.gps_fixed, size: 16),
+                              label: const Text('Ajustar ubicación'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppConfig.primaryBlue,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                minimumSize: const Size(0, 40),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

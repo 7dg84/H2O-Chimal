@@ -15,6 +15,7 @@ class ReportModel {
   final String description;
   final ReportStatus status; // Aquí se usa el enum
   final String? assignedOperatorId;
+  final String? estimatedTime;
   final List<String> media;
 
   ReportModel({
@@ -28,6 +29,7 @@ class ReportModel {
     required this.description,
     required this.status,
     this.assignedOperatorId,
+    this.estimatedTime,
     this.media = const [],
   });
 
@@ -43,6 +45,7 @@ class ReportModel {
       description: json['description'] ?? '',
       status: _parseStatus(json['status']),
       assignedOperatorId: json['assigned_operator_id'],
+      estimatedTime: json['estimated_time_interval'],
       media: List<String>.from(json['media'] ?? []),
     );
   }

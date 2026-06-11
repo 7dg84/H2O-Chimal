@@ -34,7 +34,9 @@ class ReportCard extends StatelessWidget {
         ],
       ),
       child: InkWell(
-        onTap: onTap,
+        onTap: onTap ?? () {
+          Navigator.pushNamed(context, '/report-detail', arguments: report.id);
+        },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),

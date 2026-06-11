@@ -1,9 +1,12 @@
 import 'package:app/providers/navigation_provider.dart';
 import 'package:app/providers/report_provider.dart';
+import 'package:app/providers/tramite_provider.dart';
 import 'package:app/services/report_service.dart';
+import 'package:app/services/tramite_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/config.dart';
+import 'models/report_model.dart';
 import 'providers/auth_provider.dart';
 import 'services/api_service.dart';
 import 'services/auth_service.dart';
@@ -15,12 +18,15 @@ import 'ui/screens/map_screen.dart';
 import 'ui/screens/services_screen.dart';
 import 'ui/screens/profile_screen.dart';
 import 'ui/screens/report_form_screen.dart';
+import 'ui/screens/report_detail_screen.dart';
+import 'ui/screens/report_edit_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   final apiService = ApiService();
   final authService = AuthService(apiService);
   final reportService = ReportService(apiService);
+  final tramiteService = TramiteService(apiService);
 
   runApp(
     MultiProvider(
@@ -28,6 +34,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => AuthProvider(authService)),
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
         ChangeNotifierProvider(create: (_) => ReportProvider(reportService)),
+        ChangeNotifierProvider(create: (_) => TramiteProvider(tramiteService)),
       ],
       child: const MyApp(),
     ),
@@ -98,6 +105,21 @@ class MyApp extends StatelessWidget {
           return auth.isAuthenticated ? const MainNavigation() : const WelcomeScreen();
         },
       ),
+      onGenerateRoute: (settings) {
+        if (settings.name == '/report-detail') {
+          final reportId = settings.arguments as String;
+          return MaterialPageRoute(
+            builder: (context) => ReportDetailScreen(reportId: reportId),
+          );
+        }
+        if (settings.name == '/report-edit') {
+          final report = settings.arguments as ReportModel;
+          return MaterialPageRoute(
+            builder: (context) => ReportEditScreen(report: report),
+          );
+        }
+        return null;
+      },
       routes: {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
