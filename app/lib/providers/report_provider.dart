@@ -8,6 +8,7 @@ class ReportProvider with ChangeNotifier {
   final ReportService _reportService;
   List<ReportModel> _recentReports = [];
   List<ReportModel> _allReports = [];
+  int _allReportsCount = 0;
   List<ReportCoordinate> _reportCoordinates = [];
   bool _isLoading = false;
 
@@ -15,6 +16,7 @@ class ReportProvider with ChangeNotifier {
 
   List<ReportModel> get recentReports => _recentReports;
   List<ReportModel> get allReports => _allReports;
+  int get allReportsCount => _allReportsCount;
   List<ReportCoordinate> get reportCoordinates => _reportCoordinates;
   bool get isLoading => _isLoading;
 
@@ -22,7 +24,7 @@ class ReportProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      _recentReports = await _reportService.getRecentReports(limit: 2);
+      _recentReports = await _reportService.getRecentReports();
     } catch (e) {
       print("Error fetching recent reports: $e");
     } finally {
@@ -35,7 +37,9 @@ class ReportProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      _allReports = await _reportService.getAllReports();
+      final (allReportsTmp, allReportsCountTMP) = await _reportService.getAllReports();
+      _allReports = allReportsTmp;
+      _allReportsCount = allReportsCountTMP;
     } catch (e) {
       print("Error fetching all reports: $e");
     } finally {
@@ -126,6 +130,7 @@ class ReportProvider with ChangeNotifier {
 
       await fetchRecentReports();
       await fetchReportCoordinates();
+      await fetchAllReports();
       return report;
     } catch (e) {
       print("Error creating report: $e");
@@ -175,7 +180,9 @@ class ReportProvider with ChangeNotifier {
     try {
       await _reportService.deleteReport(id);
       _recentReports.removeWhere((r) => r.id == id);
+      await fetchRecentReports();
       _reportCoordinates.removeWhere((c) => c.id == id);
+      _allReports.removeWhere((r) => r.id == id);
       notifyListeners();
       return true;
     } catch (e) {

@@ -245,10 +245,11 @@ class ServiceSerializer(serializers.ModelSerializer):
 class TramiteSerializer(serializers.ModelSerializer):
     documents = serializers.SerializerMethodField(read_only=True)
     service = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), required=True)
+    service_name = serializers.CharField(source='service.name', read_only=True)
     class Meta:
         model = Tramite
         fields = '__all__'
-        read_only_fields = ['id', 'user', 'service', 'folio', 'created_at', 'status', 'notes']
+        read_only_fields = ['id', 'user', 'service', 'service_name', 'folio', 'created_at', 'status', 'notes']
 
     def create(self, validated_data):
         validated_data.pop('user', None)  # Ensure user is not set by client

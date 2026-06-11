@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:dio/dio.dart';
 import '../models/tramite_model.dart';
 import 'api_service.dart';
 
@@ -9,7 +11,6 @@ class TramiteService {
   Future<List<TramiteModel>> getTramites() async {
     try {
       final response = await _apiService.get('/tramites/');
-      // Manejar respuesta paginada { "count": X, "results": [...] }
       final List<dynamic> results = response.data['results'] ?? [];
       return results.map((json) => TramiteModel.fromJson(json)).toList();
     } catch (e) {
@@ -23,6 +24,24 @@ class TramiteService {
         'service': serviceId,
       });
       return TramiteModel.fromJson(response.data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> uploadDocument(String tramiteId, String documentTypeId, File file) async {
+    try {
+      String fileName = file.path.split('/').last;
+      FormData formData = FormData.fromMap({
+        'tramite': tramiteId,
+        'document_type': documentTypeId,
+        'file': await MultipartFile.fromFile(
+          file.path,
+          filename: fileName,
+        ),
+      });
+
+      await _apiService.post('/documents/', data: formData);
     } catch (e) {
       rethrow;
     }

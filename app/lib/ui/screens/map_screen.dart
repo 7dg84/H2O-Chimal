@@ -23,7 +23,7 @@ class _MapScreenState extends State<MapScreen> {
     _determinePosition();
     // Cargar las coordenadas de los reportes al iniciar
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ReportProvider>().fetchRecentReports();
+      context.read<ReportProvider>().fetchReportCoordinates();
     });
   }
 
@@ -90,7 +90,7 @@ class _MapScreenState extends State<MapScreen> {
         children: [
           FlutterMap(
             mapController: _mapController,
-            options: MapOptions(
+            options: const MapOptions(
               initialCenter: LatLng(19.4184, -98.9452), // Chimalhuacán
               initialZoom: 14.0,
             ),
@@ -114,7 +114,7 @@ class _MapScreenState extends State<MapScreen> {
                       ),
                     ),
                   // Marcadores de los reportes de la API
-                  ...reportProvider.recentReports.map((coord) => Marker(
+                  ...reportProvider.reportCoordinates.map((coord) => Marker(
                         point: LatLng(coord.latitude, coord.longitude),
                         width: 35,
                         height: 35,

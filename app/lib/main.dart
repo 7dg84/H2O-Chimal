@@ -1,7 +1,9 @@
 import 'package:app/providers/navigation_provider.dart';
 import 'package:app/providers/report_provider.dart';
+import 'package:app/providers/service_provider.dart';
 import 'package:app/providers/tramite_provider.dart';
 import 'package:app/services/report_service.dart';
+import 'package:app/services/service_service.dart';
 import 'package:app/services/tramite_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +29,7 @@ void main() {
   final authService = AuthService(apiService);
   final reportService = ReportService(apiService);
   final tramiteService = TramiteService(apiService);
+  final serviceService = ServiceService(apiService);
 
   runApp(
     MultiProvider(
@@ -35,6 +38,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
         ChangeNotifierProvider(create: (_) => ReportProvider(reportService)),
         ChangeNotifierProvider(create: (_) => TramiteProvider(tramiteService)),
+        ChangeNotifierProvider(create: (_) => ServiceProvider(serviceService)),
       ],
       child: const MyApp(),
     ),

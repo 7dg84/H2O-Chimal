@@ -46,7 +46,7 @@ class ReportService {
     }
   }
 
-  Future<List<ReportModel>> getAllReports({int limit = 20}) async {
+  Future<(List<ReportModel>, int)> getAllReports({int limit = 20}) async {
     try {
       final response = await _apiService.get('/reports/', queryParameters: {
         'limit': limit,
@@ -57,7 +57,7 @@ class ReportService {
       final String next = response.data['next'] ?? '';
       final String previous = response.data['previous'] ?? '';
       final List<dynamic> results = response.data['results'] ?? [];
-      return results.map((json) => ReportModel.fromJson(json)).toList();
+      return (results.map((json) => ReportModel.fromJson(json)).toList(), count);
     } catch (e) {
       rethrow;
     }
