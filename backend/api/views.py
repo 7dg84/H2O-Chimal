@@ -32,7 +32,7 @@ class RegisterView(viewsets.GenericViewSet):
                             httponly=True, samesite='Lax', max_age=86400*30)
         return response
     
-    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    @action(detail=False, methods=['put'], permission_classes=[permissions.IsAuthenticated])
     def update_info(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

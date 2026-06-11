@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 import 'dart:io';
 import '../../core/config.dart';
 import '../../providers/report_provider.dart';
+import '../widgets/show_success_dialog.dart';
 
 class ReportFormScreen extends StatefulWidget {
   const ReportFormScreen({super.key});
@@ -145,7 +146,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
 
     if (report != null) {
       if (mounted) {
-        _showSuccessDialog(report.folio);
+        showSuccessDialog(context: context, folio: report.folio, title: '¡Reporte Enviado!', message: 'Tu reporte ha sido registrado con el folio:');
       }
     } else {
       if (mounted) {
@@ -430,35 +431,6 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     );
   }
 
-  void _showSuccessDialog(String folio) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.check_circle, color: Colors.green, size: 64),
-            const SizedBox(height: 16),
-            const Text('¡Reporte Enviado!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            const Text('Tu reporte ha sido registrado con el folio:', textAlign: TextAlign.center),
-            const SizedBox(height: 4),
-            Text('#$folio', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppConfig.primaryBlue)),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-              child: const Text('Aceptar'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 class _MapPickerDialog extends StatefulWidget {

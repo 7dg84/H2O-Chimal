@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import '../models/tramite_model.dart';
+import '../models/document_model.dart';
 import 'api_service.dart';
 
 class TramiteService {
@@ -13,6 +14,24 @@ class TramiteService {
       final response = await _apiService.get('/tramites/');
       final List<dynamic> results = response.data['results'] ?? [];
       return results.map((json) => TramiteModel.fromJson(json)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<TramiteModel> getTramiteDetail(String id) async {
+    try {
+      final response = await _apiService.get('/tramites/$id/');
+      return TramiteModel.fromJson(response.data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<DocumentModel> getDocumentDetail(String documentId) async {
+    try {
+      final response = await _apiService.get('/documents/$documentId/');
+      return DocumentModel.fromJson(response.data);
     } catch (e) {
       rethrow;
     }

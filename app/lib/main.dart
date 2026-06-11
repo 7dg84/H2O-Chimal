@@ -6,9 +6,11 @@ import 'package:app/services/report_service.dart';
 import 'package:app/services/service_service.dart';
 import 'package:app/services/tramite_service.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'core/config.dart';
 import 'models/report_model.dart';
+import 'models/service_model.dart';
 import 'providers/auth_provider.dart';
 import 'services/api_service.dart';
 import 'services/auth_service.dart';
@@ -22,9 +24,12 @@ import 'ui/screens/profile_screen.dart';
 import 'ui/screens/report_form_screen.dart';
 import 'ui/screens/report_detail_screen.dart';
 import 'ui/screens/report_edit_screen.dart';
+import 'ui/screens/tramite_form_screen.dart';
+import 'ui/screens/tramite_detail_screen.dart';
 
-void main() {
+Future<void> main() async  {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('es', null);
   final apiService = ApiService();
   final authService = AuthService(apiService);
   final reportService = ReportService(apiService);
@@ -39,6 +44,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => ReportProvider(reportService)),
         ChangeNotifierProvider(create: (_) => TramiteProvider(tramiteService)),
         ChangeNotifierProvider(create: (_) => ServiceProvider(serviceService)),
+
       ],
       child: const MyApp(),
     ),
@@ -120,6 +126,18 @@ class MyApp extends StatelessWidget {
           final report = settings.arguments as ReportModel;
           return MaterialPageRoute(
             builder: (context) => ReportEditScreen(report: report),
+          );
+        }
+        if (settings.name == '/tramite-form') {
+          final service = settings.arguments as ServiceModel;
+          return MaterialPageRoute(
+            builder: (context) => TramiteFormScreen(service: service),
+          );
+        }
+        if (settings.name == '/tramite-detail') {
+          final tramiteId = settings.arguments as String;
+          return MaterialPageRoute(
+            builder: (context) => TramiteDetailScreen(tramiteId: tramiteId),
           );
         }
         return null;

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../models/tramite_model.dart';
+import '../models/document_model.dart';
 import '../services/tramite_service.dart';
 
 class TramiteProvider with ChangeNotifier {
@@ -23,6 +24,30 @@ class TramiteProvider with ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<TramiteModel?> getTramiteDetail(String id) async {
+    _isLoading = true;
+    // Usamos microtask para evitar el error de notifyListeners durante el build si se llama desde initState
+    Future.microtask(() => notifyListeners());
+    try {
+      return await _tramiteService.getTramiteDetail(id);
+    } catch (e) {
+      print("Error fetching tramite detail: $e");
+      return null;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<DocumentModel?> getDocumentDetail(String documentId) async {
+    try {
+      return await _tramiteService.getDocumentDetail(documentId);
+    } catch (e) {
+      print("Error fetching document detail: $e");
+      return null;
     }
   }
 

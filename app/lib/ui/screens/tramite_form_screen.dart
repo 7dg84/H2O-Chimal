@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../core/config.dart';
 import '../../models/service_model.dart';
 import '../../providers/tramite_provider.dart';
+import '../widgets/show_success_dialog.dart';
 
 class TramiteFormScreen extends StatefulWidget {
   final ServiceModel service;
@@ -50,23 +51,7 @@ class _TramiteFormScreenState extends State<TramiteFormScreen> {
     if (mounted) {
       setState(() => _isSubmitting = false);
       if (tramite != null) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => AlertDialog(
-            title: const Text('¡Solicitud Enviada!'),
-            content: Text('Tu trámite ha sido registrado con el folio #${tramite.folio}.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Cerrar diálogo
-                  Navigator.of(context).pop(); // Volver a servicios
-                },
-                child: const Text('Aceptar'),
-              ),
-            ],
-          ),
-        );
+        showSuccessDialog(context: context, folio: tramite.folio, title: '¡Solicitud Enviada!', message: 'Tu tramite ha sido registrado con el folio:');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Error al crear el trámite. Inténtalo de nuevo.')),
@@ -83,7 +68,7 @@ class _TramiteFormScreenState extends State<TramiteFormScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Gestión de Agua', style: TextStyle(fontSize: 18)),
+        title: const Text('Catalogo', style: TextStyle(fontSize: 18)),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_none),
@@ -98,13 +83,6 @@ class _TramiteFormScreenState extends State<TramiteFormScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    const Icon(Icons.arrow_back, size: 16, color: Colors.grey),
-                    const SizedBox(width: 4),
-                    Text('Servicios', style: TextStyle(color: Colors.grey[600], fontSize: 14)),
-                  ],
-                ),
                 const SizedBox(height: 12),
                 Text(
                   widget.service.name,

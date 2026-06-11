@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import '../models/user_model.dart';
 import 'api_service.dart';
 
@@ -41,5 +42,16 @@ class AuthService {
 
   Future<void> logout() async {
     await _apiService.post('/auth/logout/');
+  }
+
+  Future<void> updateInfo(Map<String, dynamic> data) async {
+    try {
+      await _apiService.put('/auth/update_info/', data: data);
+    } on DioException catch (e) {
+      if (e.response != null && e.response!.data is Map) {
+        throw e.response!.data; // Devolvemos el mapa de errores
+      }
+      rethrow;
+    }
   }
 }

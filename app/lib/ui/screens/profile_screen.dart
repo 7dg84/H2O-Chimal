@@ -6,6 +6,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/report_provider.dart';
 import '../../providers/tramite_provider.dart';
 import '../widgets/report_card.dart';
+import '../widgets/tramite_card.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -150,13 +151,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 )
               else
-                ...tramiteProvider.tramites.map((tramite) => _buildTramiteListItem(
-                  folio: tramite.folio,
-                  service: tramite.serviceName,
-                  date: DateFormat('dd MMM yyyy').format(tramite.createdAt),
-                  status: tramite.statusText,
-                  statusColor: tramite.statusColor,
-                )),
+                ...tramiteProvider.tramites.map((tramite) => TramiteCard(tramite: tramite,)),
+                //     _buildTramiteListItem(
+                //   folio: tramite.folio,
+                //   service: tramite.serviceName,
+                //   date: DateFormat('dd MMM yyyy').format(tramite.createdAt),
+                //   status: tramite.statusText,
+                //   statusColor: tramite.statusColor,
+                // )),
                 const SizedBox(height: 40),
             ],
           ),

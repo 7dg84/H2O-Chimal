@@ -37,6 +37,16 @@
             android:value="2" />
     </application>
     <queries>
+        <!-- Agrega estas líneas para permitir la apertura de URLs -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <!-- Línea existente de PROCESS_TEXT -->
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>

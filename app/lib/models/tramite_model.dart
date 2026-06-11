@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/config.dart';
+import '../models/document_model.dart';
 
 enum TramiteStatus { creado, enTramite, completado }
 
@@ -10,6 +11,7 @@ class TramiteModel {
   final DateTime createdAt;
   final TramiteStatus status;
   final String? notes;
+  final List<TramiteDocumentModel>? documents;
 
   TramiteModel({
     required this.id,
@@ -18,6 +20,7 @@ class TramiteModel {
     required this.createdAt,
     required this.status,
     this.notes,
+    this.documents,
   });
 
   factory TramiteModel.fromJson(Map<String, dynamic> json) {
@@ -30,6 +33,11 @@ class TramiteModel {
       createdAt: DateTime.parse(json['created_at']),
       status: _parseStatus(json['status']),
       notes: json['notes'],
+        documents: json['documents'] != null
+            ? List<TramiteDocumentModel>.from(
+            json['documents'].map((doc) => TramiteDocumentModel.fromJson(doc))
+        )
+            : null,
     );
   }
 

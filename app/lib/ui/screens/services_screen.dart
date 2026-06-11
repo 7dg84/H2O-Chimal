@@ -149,9 +149,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Iniciando trámite: ${service.name}')),
-              );
+              Navigator.pushNamed(context, '/tramite-form', arguments: service);
             },
             child: const Text('Iniciar Trámite'),
           ),
