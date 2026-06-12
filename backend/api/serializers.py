@@ -25,6 +25,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = ['email', 'password', 'curp', 'name', 'phone',
                   'postal_code', 'colonia', 'street', 'block', 'exterior_number']
+        read_only_fields = ['id', 'email', 'curp']
 
     def create(self, validated_data):
         # Required fields check
@@ -66,14 +67,11 @@ class RegisterSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         # Required fields check
         phone = validated_data.get('phone')
-        curp = validated_data.get('curp')
         postal_code = validated_data.get('postal_code')
 
         if not phone:
             raise serializers.ValidationError(
                 {'phone': 'Número de teléfono requerido'})
-        if not curp:
-            raise serializers.ValidationError({'curp': 'CURP requerida'})
         if not postal_code:
             raise serializers.ValidationError(
                 {'postal_code': 'Código postal requerido'})
@@ -83,10 +81,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {'phone': 'Número de teléfono inválido'})
 
-        # Validate CURP format
-        curp_pattern = r'^[A-Z]{4}\d{6}[HM][A-Z]{5}[0-9A-Z]\d$'
-        if not re.match(curp_pattern, curp):
-            raise serializers.ValidationError({'curp': 'CURP inválida'})
 
         # validate postal code
         if not postal_code.isdigit() or len(postal_code) != 5:
@@ -96,6 +90,19 @@ class RegisterSerializer(serializers.ModelSerializer):
         # Handle password if provided
         password = validated_data.pop('password', None)
 
+        # Prevent changing email
+        if 'email' in validated_data and validated_data['email'] != instance.email:
+            raise serializers.ValidationError({'email': 'No se puede cambiar el correo electrónico.'})
+        
+        # Delete curp if it's the same as existing to avoid unique constraint error
+        # if 'curp' in validated_data and validated_data['curp'] == instance.curp:
+        #     validated_data.pop('curp')
+        # else:  # If curp is being changed, validate the new one
+        #     # Validate CURP format
+        #     curp_pattern = r'^[A-Z]{4}\d{6}[HM][A-Z]{5}[0-9A-Z]\d$'
+        #     if not re.match(curp_pattern, validated_data.get('curp', '')):
+        #         raise serializers.ValidationError({'curp': 'CURP inválida'})
+        
         # Update simple fields on the instance
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -103,7 +110,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         if password:
             instance.set_password(password)
 
-        instance.save()
+        # instance.save()
         return instance
 
 

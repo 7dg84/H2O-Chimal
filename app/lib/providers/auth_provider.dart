@@ -79,7 +79,10 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> updateProfile({
+  Future<Map<String, dynamic>?> updateProfile({
+    required String email,
+    required String curp,
+    required String password,
     required String name,
     required String phone,
     required String postalCode,
@@ -91,7 +94,10 @@ class AuthProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      _user = await _authService.updateUser({
+      await _authService.updateInfo({
+        // 'email': email,
+        // 'curp': curp,
+        'password': password,
         'name': name,
         'phone': phone,
         'postal_code': postalCode,
@@ -100,13 +106,20 @@ class AuthProvider with ChangeNotifier {
         'block': block,
         'exterior_number': exteriorNumber,
       });
+      
+      // Refrescamos los datos del usuario después de la actualización exitosa
+      _user = await _authService.getCurrentUser();
+      
       _isLoading = false;
       notifyListeners();
-      return true;
+      return null; // Éxito
     } catch (e) {
       _isLoading = false;
       notifyListeners();
-      return false;
+      if (e is Map<String, dynamic>) {
+        return e; // Devolvemos el mapa de errores del servidor
+      }
+      return {'error': 'Ocurrió un error inesperado'};
     }
   }
 

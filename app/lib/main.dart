@@ -26,6 +26,7 @@ import 'ui/screens/report_detail_screen.dart';
 import 'ui/screens/report_edit_screen.dart';
 import 'ui/screens/tramite_form_screen.dart';
 import 'ui/screens/tramite_detail_screen.dart';
+import 'ui/screens/edit_profile_screen.dart';
 
 Future<void> main() async  {
   WidgetsFlutterBinding.ensureInitialized();
@@ -146,6 +147,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/report-fuga': (context) => const ReportFormScreen(),
+        '/edit-profile': (context) => const EditProfileScreen(),
       },
     );
   }

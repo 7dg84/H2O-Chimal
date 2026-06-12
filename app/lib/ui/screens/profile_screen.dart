@@ -97,7 +97,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       '${user?.street} ${user?.exteriorNumber}, ${user?.colonia}'),
                     const SizedBox(height: 24),
                     OutlinedButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/edit-profile');
+                      },
                       icon: const Icon(Icons.edit_outlined, size: 18),
                       label: const Text('Editar Perfil'),
                       style: OutlinedButton.styleFrom(

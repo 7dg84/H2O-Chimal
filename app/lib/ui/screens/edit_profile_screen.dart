@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/config.dart';
 import '../../providers/auth_provider.dart';
-import '../../models/user_model.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -15,6 +14,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   
   // Controllers
+  late TextEditingController _emailController;
+  late TextEditingController _passwordController;
+  late TextEditingController _curpController;
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
   late TextEditingController _postalCodeController;
@@ -23,11 +25,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _blockController;
   late TextEditingController _exteriorNumberController;
 
+  Map<String, dynamic>? _serverErrors;
+
   @override
   void initState() {
     super.initState();
     final user = context.read<AuthProvider>().user;
     
+    _emailController = TextEditingController(text: user?.email ?? '');
+    _passwordController = TextEditingController();
+    _curpController = TextEditingController(text: user?.curp ?? '');
     _nameController = TextEditingController(text: user?.name ?? '');
     _phoneController = TextEditingController(text: user?.phone ?? '');
     _postalCodeController = TextEditingController(text: user?.postalCode ?? '');
@@ -39,6 +46,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _curpController.dispose();
     _nameController.dispose();
     _phoneController.dispose();
     _postalCodeController.dispose();
@@ -50,8 +60,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   void _handleUpdate() async {
+    setState(() => _serverErrors = null);
+    
     if (_formKey.currentState!.validate()) {
-      final success = await context.read<AuthProvider>().updateProfile(
+      final errors = await context.read<AuthProvider>().updateProfile(
+        email: _emailController.text,
+        curp: _curpController.text.toUpperCase(),
+        password: _passwordController.text,
         name: _nameController.text,
         phone: _phoneController.text,
         postalCode: _postalCodeController.text,
@@ -61,7 +76,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         exteriorNumber: _exteriorNumberController.text,
       );
 
-      if (success) {
+      if (errors == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Perfil actualizado exitosamente')),
@@ -69,9 +84,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           Navigator.pop(context);
         }
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Error al actualizar el perfil.')),
+        setState(() => _serverErrors = errors);
+        // Volvemos a validar para mostrar los errores del servidor en los campos
+        _formKey.currentState!.validate();
+        
+        if (mounted && errors.containsKey('error')) {
+           ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errors['error'].toString()), backgroundColor: Colors.red),
           );
         }
       }
@@ -80,8 +99,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<AuthProvider>().user;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Editar Perfil'),
@@ -93,22 +110,63 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionTitle('Información Personal'),
-              const SizedBox(height: 8),
-              Text(
-                'CURP: ${user?.curp ?? "No disponible"}',
-                style: const TextStyle(color: Colors.grey, fontSize: 13),
+              _buildSectionTitle('Datos de Acceso'),
+              const SizedBox(height: 16),
+              _buildTextField(
+                'Correo electrónico', 
+                _emailController, 
+                Icons.email_outlined, 
+                serverErrorKey: 'email',
+                keyboardType: TextInputType.emailAddress,
+                validator: (v) {
+                  if (v == null || v.isEmpty) return 'Campo requerido';
+                  final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                  if (!emailRegex.hasMatch(v)) return 'Email inválido';
+                  return null;
+                }
               ),
               const SizedBox(height: 16),
-              _buildTextField('Nombre completo', _nameController, Icons.person_outline),
+              _buildTextField(
+                'Confirmar Contraseña', 
+                _passwordController, 
+                Icons.lock_outline, 
+                obscureText: true, 
+                serverErrorKey: 'password',
+                helperText: 'Ingrese su contraseña actual o una nueva (mín. 8 car.)',
+                validator: (v) => (v == null || v.length < 8) ? 'Mínimo 8 caracteres' : null
+              ),
+              
+              const SizedBox(height: 32),
+              _buildSectionTitle('Información Personal'),
               const SizedBox(height: 16),
-              _buildTextField('Número telefónico', _phoneController, Icons.phone_android_outlined, 
+              _buildTextField('Nombre completo', _nameController, Icons.person_outline, serverErrorKey: 'name'),
+              const SizedBox(height: 16),
+              _buildTextField(
+                'CURP', 
+                _curpController, 
+                Icons.badge_outlined, 
+                serverErrorKey: 'curp',
+                helperText: '18 caracteres alfanuméricos',
+                validator: (v) {
+                  if (v == null || v.isEmpty) return 'Campo requerido';
+                  final curpRegex = RegExp(r'^[A-Z]{4}\d{6}[HM][A-Z]{5}[0-9A-Z]\d$');
+                  if (!curpRegex.hasMatch(v.toUpperCase())) return 'Formato de CURP inválido';
+                  return null;
+                }
+              ),
+              const SizedBox(height: 16),
+              _buildTextField(
+                'Número telefónico', 
+                _phoneController, 
+                Icons.phone_android_outlined, 
+                serverErrorKey: 'phone',
                 keyboardType: TextInputType.phone,
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Campo requerido';
                   if (v.length != 10 || !RegExp(r'^[0-9]+$').hasMatch(v)) return '10 dígitos requeridos';
                   return null;
-                }),
+                }
+              ),
               
               const SizedBox(height: 32),
               _buildSectionTitle('Domicilio'),
@@ -117,27 +175,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: _buildTextField('Código postal', _postalCodeController, null, 
+                    child: _buildTextField(
+                      'Código postal', 
+                      _postalCodeController, 
+                      null, 
+                      serverErrorKey: 'postal_code',
                       keyboardType: TextInputType.number,
                       validator: (v) {
                         if (v == null || v.isEmpty) return 'Requerido';
                         if (v.length != 5 || !RegExp(r'^[0-9]+$').hasMatch(v)) return '5 dígitos';
                         return null;
-                      }),
+                      }
+                    ),
                   ),
                   const SizedBox(width: 16),
-                  Expanded(child: _buildTextField('Colonia', _coloniaController, null)),
+                  Expanded(child: _buildTextField('Colonia', _coloniaController, null, serverErrorKey: 'colonia')),
                 ],
               ),
               const SizedBox(height: 16),
-              _buildTextField('Calle', _streetController, null),
+              _buildTextField('Calle', _streetController, null, serverErrorKey: 'street'),
               const SizedBox(height: 16),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: _buildTextField('Manzana', _blockController, null)),
+                  Expanded(child: _buildTextField('Manzana', _blockController, null, serverErrorKey: 'block')),
                   const SizedBox(width: 16),
-                  Expanded(child: _buildTextField('Número exterior', _exteriorNumberController, null)),
+                  Expanded(child: _buildTextField('Número exterior', _exteriorNumberController, null, serverErrorKey: 'exterior_number')),
                 ],
               ),
               
@@ -200,6 +263,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     IconData? icon, {
     bool obscureText = false,
     String? helperText,
+    String? serverErrorKey,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
   }) {
@@ -212,13 +276,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
+          textCapitalization: label == 'CURP' ? TextCapitalization.characters : TextCapitalization.none,
           decoration: InputDecoration(
             prefixIcon: icon != null ? Icon(icon, size: 20) : null,
             hintText: label,
             helperText: helperText,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           ),
-          validator: validator ?? (value) => (value == null || value.isEmpty) ? 'Campo requerido' : null,
+          validator: (value) {
+            // Primero revisamos errores del servidor
+            if (_serverErrors != null && serverErrorKey != null && _serverErrors!.containsKey(serverErrorKey)) {
+              final error = _serverErrors![serverErrorKey];
+              if (error is List) return error.join(', ');
+              return error.toString();
+            }
+            // Si no hay error del servidor, usamos la validación local
+            return validator != null ? validator(value) : (value == null || value.isEmpty ? 'Campo requerido' : null);
+          },
         ),
       ],
     );
