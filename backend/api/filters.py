@@ -17,8 +17,7 @@ class ReportFilter(django_filters.FilterSet):
         fields = {
             'status': ['exact'],
             'report_type': ['exact'],
-            'reported_at': ['exact', 'gte', 'lte', 'range'],
-            'reported_at__month': ['exact', 'gte', 'lte', 'range'],
+            'reported_at': ['exact', 'gte', 'lte', 'range', 'month__gte'],
             'id': ['icontains'],
             'folio': ['exact', 'gte', 'lte', 'range'],
             'latitude': ['exact', 'gte', 'lte', 'range'],
