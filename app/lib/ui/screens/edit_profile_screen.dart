@@ -116,6 +116,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 'Correo electrónico', 
                 _emailController, 
                 Icons.email_outlined, 
+                enabled: false, // El correo no se puede cambiar
                 serverErrorKey: 'email',
                 keyboardType: TextInputType.emailAddress,
                 validator: (v) {
@@ -145,6 +146,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 'CURP', 
                 _curpController, 
                 Icons.badge_outlined, 
+                enabled: false, // El CURP no se puede cambiar
                 serverErrorKey: 'curp',
                 helperText: '18 caracteres alfanuméricos',
                 validator: (v) {
@@ -266,22 +268,36 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     String? serverErrorKey,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
+    bool enabled = true,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+        Text(
+          label, 
+          style: TextStyle(
+            fontWeight: FontWeight.w600, 
+            fontSize: 14,
+            color: enabled ? Colors.black : Colors.grey[600],
+          )
+        ),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
+          enabled: enabled,
           textCapitalization: label == 'CURP' ? TextCapitalization.characters : TextCapitalization.none,
+          style: TextStyle(
+            color: enabled ? Colors.black : Colors.grey[600],
+          ),
           decoration: InputDecoration(
-            prefixIcon: icon != null ? Icon(icon, size: 20) : null,
+            prefixIcon: icon != null ? Icon(icon, size: 20, color: enabled ? null : Colors.grey) : null,
             hintText: label,
             helperText: helperText,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            filled: !enabled,
+            fillColor: enabled ? null : Colors.grey[100],
           ),
           validator: (value) {
             // Primero revisamos errores del servidor

@@ -19,7 +19,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=8, required=False)
+    password = serializers.CharField(
+        write_only=True, min_length=8, required=False)
 
     class Meta:
         model = get_user_model()
@@ -59,11 +60,12 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         password = validated_data.pop('password', None)
         if not password:
-            raise serializers.ValidationError({'password': 'Password requerido'})
+            raise serializers.ValidationError(
+                {'password': 'Password requerido'})
         # Use the custom manager to create the user (handles password properly)
         user = get_user_model().objects.create_user(**validated_data, password=password)
         return user
-    
+
     def update(self, instance, validated_data):
         # Required fields check
         phone = validated_data.get('phone')
@@ -81,7 +83,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {'phone': 'Número de teléfono inválido'})
 
-
         # validate postal code
         if not postal_code.isdigit() or len(postal_code) != 5:
             raise serializers.ValidationError(
@@ -92,8 +93,9 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         # Prevent changing email
         if 'email' in validated_data and validated_data['email'] != instance.email:
-            raise serializers.ValidationError({'email': 'No se puede cambiar el correo electrónico.'})
-        
+            raise serializers.ValidationError(
+                {'email': 'No se puede cambiar el correo electrónico.'})
+
         # Delete curp if it's the same as existing to avoid unique constraint error
         # if 'curp' in validated_data and validated_data['curp'] == instance.curp:
         #     validated_data.pop('curp')
@@ -102,7 +104,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         #     curp_pattern = r'^[A-Z]{4}\d{6}[HM][A-Z]{5}[0-9A-Z]\d$'
         #     if not re.match(curp_pattern, validated_data.get('curp', '')):
         #         raise serializers.ValidationError({'curp': 'CURP inválida'})
-        
+
         # Update simple fields on the instance
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -116,6 +118,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class ReportSerializer(serializers.ModelSerializer):
     media = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Report
         fields = '__all__'
@@ -124,11 +127,11 @@ class ReportSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('user', None)  # Ensure user is not set by client
-        validated_data.pop('notes', None) 
+        validated_data.pop('notes', None)
         user = self.context['request'].user
         validated_data['user'] = user
         return super().create(validated_data)
-    
+
     def get_media(self, obj):
         media_qs = Media.objects.filter(report=obj)
         # Return only list of media IDs to avoid generating presigned URLs for every media
@@ -161,15 +164,19 @@ class MediaSerializer(serializers.ModelSerializer):
             storage = MediaStorage()
             bucket = storage.bucket_name
             # Use public endpoint for signing if provided in settings, otherwise fall back to storage's endpoint
-            endpoint = getattr(settings, 'CEPH_PUBLIC_ENDPOINT', None) or storage.connection.meta.client.meta.endpoint_url
+            endpoint = getattr(settings, 'CEPH_PUBLIC_ENDPOINT',
+                               None) or storage.connection.meta.client.meta.endpoint_url
             # If we have a public endpoint, create a boto3 client that will sign URLs for that host
             if endpoint:
                 client = boto3.client('s3',
-                    endpoint_url=endpoint,
-                    aws_access_key_id=getattr(settings, 'AWS_ACCESS_KEY_ID', os.environ.get('CEPH_ACCESS_KEY')),
-                    aws_secret_access_key=getattr(settings, 'AWS_SECRET_ACCESS_KEY', os.environ.get('CEPH_SECRET_KEY')),
-                    region_name=getattr(settings, 'AWS_S3_REGION_NAME', os.environ.get('CEPH_REGION')),
-                )
+                                      endpoint_url=endpoint,
+                                      aws_access_key_id=getattr(
+                                          settings, 'AWS_ACCESS_KEY_ID', os.environ.get('CEPH_ACCESS_KEY')),
+                                      aws_secret_access_key=getattr(
+                                          settings, 'AWS_SECRET_ACCESS_KEY', os.environ.get('CEPH_SECRET_KEY')),
+                                      region_name=getattr(
+                                          settings, 'AWS_S3_REGION_NAME', os.environ.get('CEPH_REGION')),
+                                      )
             else:
                 client = storage.connection.meta.client
         except Exception:
@@ -180,17 +187,21 @@ class MediaSerializer(serializers.ModelSerializer):
             # If we created a client using endpoint (above), regenerate it with path addressing
             if endpoint:
                 client = boto3.client('s3',
-                    endpoint_url=endpoint,
-                    aws_access_key_id=getattr(settings, 'AWS_ACCESS_KEY_ID', os.environ.get('CEPH_ACCESS_KEY')),
-                    aws_secret_access_key=getattr(settings, 'AWS_SECRET_ACCESS_KEY', os.environ.get('CEPH_SECRET_KEY')),
-                    region_name=getattr(settings, 'AWS_S3_REGION_NAME', os.environ.get('CEPH_REGION')),
-                    config=Config(s3={'addressing_style': 'path'})
-                )
+                                      endpoint_url=endpoint,
+                                      aws_access_key_id=getattr(
+                                          settings, 'AWS_ACCESS_KEY_ID', os.environ.get('CEPH_ACCESS_KEY')),
+                                      aws_secret_access_key=getattr(
+                                          settings, 'AWS_SECRET_ACCESS_KEY', os.environ.get('CEPH_SECRET_KEY')),
+                                      region_name=getattr(
+                                          settings, 'AWS_S3_REGION_NAME', os.environ.get('CEPH_REGION')),
+                                      config=Config(
+                                          s3={'addressing_style': 'path'})
+                                      )
 
             return client.generate_presigned_url('get_object', Params={'Bucket': bucket, 'Key': obj.storage_key}, ExpiresIn=3600)
         except Exception:
             return None
-        
+
     def create(self, validated_data):
         # validate if the report belongs to the user (if citizen) or is assigned to the operator (if operator)
         request = self.context['request']
@@ -198,16 +209,19 @@ class MediaSerializer(serializers.ModelSerializer):
         report = validated_data.get('report')
         # report is required on create
         if not report:
-            raise serializers.ValidationError({'report': 'Este campo es requerido.'})
+            raise serializers.ValidationError(
+                {'report': 'Este campo es requerido.'})
         if user and getattr(user, 'role', '') == 'citizen':
             if report.user_id != user.id:
-                raise serializers.ValidationError('Reporte no pertenece al usuario')
+                raise serializers.ValidationError(
+                    'Reporte no pertenece al usuario')
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
         # Prevent changing the `report` of an existing Media
         if 'report' in validated_data and validated_data['report'] != instance.report:
-            raise serializers.ValidationError({'report': 'No se puede cambiar el reporte asociado a un medio.'})
+            raise serializers.ValidationError(
+                {'report': 'No se puede cambiar el reporte asociado a un medio.'})
         return super().update(instance, validated_data)
 
 
@@ -231,27 +245,34 @@ class DocumentSerializer(serializers.ModelSerializer):
             # If we have a public endpoint, create a boto3 client that will sign URLs for that host
             if endpoint:
                 client = boto3.client('s3',
-                    endpoint_url=endpoint,
-                    aws_access_key_id=getattr(settings, 'AWS_ACCESS_KEY_ID', os.environ.get('CEPH_ACCESS_KEY')),
-                    aws_secret_access_key=getattr(settings, 'AWS_SECRET_ACCESS_KEY', os.environ.get('CEPH_SECRET_KEY')),
-                    region_name=getattr(settings, 'AWS_S3_REGION_NAME', os.environ.get('CEPH_REGION')),
-                )
+                                      endpoint_url=endpoint,
+                                      aws_access_key_id=getattr(
+                                          settings, 'AWS_ACCESS_KEY_ID', os.environ.get('CEPH_ACCESS_KEY')),
+                                      aws_secret_access_key=getattr(
+                                          settings, 'AWS_SECRET_ACCESS_KEY', os.environ.get('CEPH_SECRET_KEY')),
+                                      region_name=getattr(
+                                          settings, 'AWS_S3_REGION_NAME', os.environ.get('CEPH_REGION')),
+                                      )
             else:
                 client = storage.connection.meta.client
         except Exception:
             return None
-        
+
         try:
             # Ensure path-style addressing so public endpoint with path prefixes works
             # If we created a client using endpoint (above), regenerate it with path addressing
             if endpoint:
                 client = boto3.client('s3',
-                    endpoint_url=endpoint,
-                    aws_access_key_id=getattr(settings, 'AWS_ACCESS_KEY_ID', os.environ.get('CEPH_ACCESS_KEY')),
-                    aws_secret_access_key=getattr(settings, 'AWS_SECRET_ACCESS_KEY', os.environ.get('CEPH_SECRET_KEY')),
-                    region_name=getattr(settings, 'AWS_S3_REGION_NAME', os.environ.get('CEPH_REGION')),
-                    config=Config(s3={'addressing_style': 'path'})
-                )
+                                      endpoint_url=endpoint,
+                                      aws_access_key_id=getattr(
+                                          settings, 'AWS_ACCESS_KEY_ID', os.environ.get('CEPH_ACCESS_KEY')),
+                                      aws_secret_access_key=getattr(
+                                          settings, 'AWS_SECRET_ACCESS_KEY', os.environ.get('CEPH_SECRET_KEY')),
+                                      region_name=getattr(
+                                          settings, 'AWS_S3_REGION_NAME', os.environ.get('CEPH_REGION')),
+                                      config=Config(
+                                          s3={'addressing_style': 'path'})
+                                      )
 
             return client.generate_presigned_url('get_object', Params={'Bucket': bucket, 'Key': obj.storage_key}, ExpiresIn=3600)
         except Exception:
@@ -262,12 +283,14 @@ class DocumentSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         user = getattr(request, 'user', None)
         if not user or not user.is_authenticated:
-            raise serializers.ValidationError('Authentication required to create a Document')
+            raise serializers.ValidationError(
+                'Authentication required to create a Document')
 
         # If the user is a citizen, ensure the tramite belongs to them
         tramite = validated_data.get('tramite')
         if tramite and getattr(user, 'role', '') == 'citizen' and tramite.user_id != user.id:
-            raise serializers.ValidationError('El tramite no pertenece al usuario autenticado')
+            raise serializers.ValidationError(
+                'El tramite no pertenece al usuario autenticado')
 
         return super().create(validated_data)
 
@@ -296,44 +319,54 @@ class ServiceSerializer(serializers.ModelSerializer):
 
 class TramiteSerializer(serializers.ModelSerializer):
     documents = serializers.SerializerMethodField(read_only=True)
-    service = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), required=True)
+    service = serializers.PrimaryKeyRelatedField(
+        queryset=Service.objects.all(), required=True)
     service_name = serializers.CharField(source='service.name', read_only=True)
+
     class Meta:
         model = Tramite
         fields = '__all__'
-        read_only_fields = ['id', 'user', 'service', 'service_name', 'folio', 'created_at', 'status', 'notes']
+        read_only_fields = ['id', 'user', 'service',
+                            'service_name', 'folio', 'created_at', 'status', 'notes']
 
     def create(self, validated_data):
         validated_data.pop('user', None)  # Ensure user is not set by client
         validated_data.pop('folio', None)  # Ensure folio is not set by client
-        validated_data.pop('status', None)  # Ensure status is not set by client
-        validated_data.pop('notes', None)  # Ensure created_at is not set by client
+        # Ensure status is not set by client
+        validated_data.pop('status', None)
+        # Ensure created_at is not set by client
+        validated_data.pop('notes', None)
         user = self.context['request'].user
         validated_data['user'] = user
-        if 'service' not in validated_data: # service is required on create
-            raise serializers.ValidationError({'service': 'Este campo es requerido.'})
+        if 'service' not in validated_data:  # service is required on create
+            raise serializers.ValidationError(
+                {'service': 'Este campo es requerido.'})
         return super().create(validated_data)
-    
+
     def get_documents(self, obj):
         docs_qs = Document.objects.filter(tramite=obj)
-        return [{"id":d.id,"filename": d.filename} for d in docs_qs]
+        return [{"id": d.id, "filename": d.filename} for d in docs_qs]
 
 
 class DocumentTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = DocumentType
         fields = '__all__'
-        
+
+
 class ServiceRequirementSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceRequirement
         fields = '__all__'
-        
+
 # View active reports for the map
+
+
 class ReportsCoordinatesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Report
-        fields = ['id', 'latitude', 'longitude', 'report_type'] 
+        fields = ['id', 'latitude', 'longitude', 'report_type']
+
 
 class AuditLogSerializer(serializers.ModelSerializer):
     class Meta:

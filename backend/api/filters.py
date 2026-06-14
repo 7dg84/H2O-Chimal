@@ -1,6 +1,7 @@
 import django_filters
 from .models import Report, Service, Media, Tramite, Document, ServiceRequirement, AuditLog
-        
+
+
 class ServiceFilter(django_filters.FilterSet):
     class Meta:
         model = Service
@@ -9,6 +10,7 @@ class ServiceFilter(django_filters.FilterSet):
             'description': ['icontains'],
         }
 
+
 class ReportFilter(django_filters.FilterSet):
     class Meta:
         model = Report
@@ -16,13 +18,15 @@ class ReportFilter(django_filters.FilterSet):
             'status': ['exact'],
             'report_type': ['exact'],
             'reported_at': ['exact', 'gte', 'lte', 'range'],
+            'reported_at__month': ['exact', 'gte', 'lte', 'range'],
             'id': ['icontains'],
             'folio': ['exact', 'gte', 'lte', 'range'],
             'latitude': ['exact', 'gte', 'lte', 'range'],
             'longitude': ['exact', 'gte', 'lte', 'range'],
             'assigned_operator_id': ['exact'],
         }
-        
+
+
 class MediaFilter(django_filters.FilterSet):
     class Meta:
         model = Media
@@ -32,7 +36,8 @@ class MediaFilter(django_filters.FilterSet):
             'filename': ['icontains'],
             'mime_type': ['icontains'],
         }
-        
+
+
 class TramiteFilter(django_filters.FilterSet):
     class Meta:
         model = Tramite
@@ -43,7 +48,8 @@ class TramiteFilter(django_filters.FilterSet):
             'created_at': ['exact', 'gte', 'lte', 'range'],
             'status': ['exact'],
         }
-        
+
+
 class DocumentFilter(django_filters.FilterSet):
     class Meta:
         model = Document
@@ -55,14 +61,16 @@ class DocumentFilter(django_filters.FilterSet):
             'filename': ['icontains'],
             'mime_type': ['icontains'],
         }
-        
+
+
 class ServiceRequirementFilter(django_filters.FilterSet):
     class Meta:
         model = ServiceRequirement
         fields = {'required': ['exact'],
                   'service': ['exact'],
                   'document_type': ['exact']}
-        
+
+
 class ReportCoordinateFilter(django_filters.FilterSet):
     class Meta:
         model = Report
@@ -71,7 +79,8 @@ class ReportCoordinateFilter(django_filters.FilterSet):
             'latitude': ['exact', 'gte', 'lte', 'range'],
             'longitude': ['exact', 'gte', 'lte', 'range'],
         }
-        
+
+
 class AuditLogFilter(django_filters.FilterSet):
     class Meta:
         model = AuditLog

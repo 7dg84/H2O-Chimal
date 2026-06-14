@@ -12,7 +12,7 @@ from .auth import CookieTokenAuthentication
 from .permissions import IsOperator, IsAdmin, IsOperatorOrAdmin
 from h2o.storage_backends import MediaStorage, DocumentStorage
 from django.core.exceptions import ValidationError
-from .filters import ReportFilter, ServiceFilter, MediaFilter, TramiteFilter, DocumentFilter,ServiceRequirementFilter, ReportCoordinateFilter, AuditLogFilter
+from .filters import ReportFilter, ServiceFilter, MediaFilter, TramiteFilter, DocumentFilter, ServiceRequirementFilter, ReportCoordinateFilter, AuditLogFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
 
@@ -31,7 +31,7 @@ class RegisterView(viewsets.GenericViewSet):
         response.set_cookie(key='auth_token', value=token.key,
                             httponly=True, samesite='Lax', max_age=86400*30)
         return response
-    
+
     @action(detail=False, methods=['put'], permission_classes=[permissions.IsAuthenticated])
     def update_info(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -87,7 +87,8 @@ class ReportViewSet(viewsets.ModelViewSet):
     # Filters and search
     filterset_class = ReportFilter
     search_fields = ['folio', 'description', 'location_text', 'user__curp']
-    ordering_fields = ['reported_at', 'folio', 'status', 'estimared_time_interval']
+    ordering_fields = ['reported_at', 'folio',
+                       'status', 'estimared_time_interval']
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -174,7 +175,7 @@ class MediaViewSet(viewsets.ModelViewSet):
     serializer_class = MediaSerializer
     permission_classes = [permissions.IsAuthenticated]
     storage = MediaStorage()
-    
+
     # Filters and search
     filterset_class = MediaFilter
     search_fields = ['filename', 'report__user__curp', 'report__location_text']
@@ -238,10 +239,11 @@ class DocumentViewSet(viewsets.ModelViewSet):
     serializer_class = DocumentSerializer
     permission_classes = [permissions.IsAuthenticated]
     storage = DocumentStorage()
-    
+
     # Filters and search
     filterset_class = DocumentFilter
-    search_fields = ['user__curp', 'tramite__folio', 'document_type__name', 'filename']
+    search_fields = ['user__curp', 'tramite__folio',
+                     'document_type__name', 'filename']
     ordering_fields = ['uploaded_at', 'document_type', 'mime_type', 'size']
 
     def create(self, request, *args, **kwargs):
@@ -301,7 +303,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.all().order_by('name')
     serializer_class = ServiceSerializer
     permission_classes = [permissions.AllowAny]
-    
+
     # Filters and search
     filterset_class = ServiceFilter
     search_fields = ['name', 'description']
@@ -319,7 +321,7 @@ class TramiteViewSet(viewsets.ModelViewSet):
     queryset = Tramite.objects.all().order_by('-created_at')
     serializer_class = TramiteSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     # Filters and search
     filterset_class = TramiteFilter
     search_fields = ['user__curp', 'service__name', 'folio']
@@ -391,7 +393,7 @@ class DocumentTypeViewSet(viewsets.ModelViewSet):
     queryset = DocumentType.objects.all().order_by('name')
     serializer_class = DocumentTypeSerializer
     permission_classes = [IsAdmin]
-    
+
     # Filters and search
     search_fields = ['name', 'description']
     ordering_fields = ['name']
@@ -401,23 +403,25 @@ class RequirementViewSet(viewsets.ModelViewSet):
     queryset = ServiceRequirement.objects.all().order_by('service', 'document_type')
     serializer_class = ServiceRequirementSerializer
     permission_classes = [IsAdmin]
-    
+
     # Filters and search
     filterset_class = ServiceRequirementFilter
     search_fields = ['notes', 'service__name', 'document_type__name']
     ordering_fields = ['service__name', 'document_type__name', 'required']
-    
-    
+
+
 class ReportCoordinateViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Report.objects.filter(latitude__isnull=False, longitude__isnull=False, status__in=['Recibido', 'En revisión', 'En atención']).order_by('-reported_at').only('id', 'latitude', 'longitude', 'status')
+    queryset = Report.objects.filter(latitude__isnull=False, longitude__isnull=False, status__in=[
+                                     'Recibido', 'En revisión', 'En atención']).order_by('-reported_at').only('id', 'latitude', 'longitude', 'status')
     serializer_class = ReportsCoordinatesSerializer
     permission_classes = [permissions.AllowAny]
-    
+
     # Filters and search
     filterset_class = ReportCoordinateFilter
-    ordering_fields = ['reported_at', 'latitide', 'longitude', 'estimated_time_interval']
-    
-    # max 20 
+    ordering_fields = ['reported_at', 'latitide',
+                       'longitude', 'estimated_time_interval']
+
+    # max 20
     max_page_size = 20
     page_size = 20
 
@@ -426,7 +430,7 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = AuditLog.objects.all().order_by('-created_at')
     serializer_class = AuditLogSerializer
     permission_classes = [IsAdmin]
-    
+
     # Filters and search
     filterset_class = AuditLogFilter
     search_fields = ['user__email', 'action', 'target_type', 'target_id']

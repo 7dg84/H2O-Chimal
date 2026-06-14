@@ -2,6 +2,8 @@ import 'package:app/providers/navigation_provider.dart';
 import 'package:app/providers/report_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import '../../core/config.dart';
 import '../../providers/auth_provider.dart';
 import '../widgets/report_card.dart';
@@ -27,6 +29,17 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().user;
     final reportProvider = context.watch<ReportProvider>();
+
+    // Coordenadas por defecto (Chimalhuacán)
+    LatLng center = const LatLng(19.4172, -98.9483);
+    
+    // Si hay reportes, centramos en el primero para dar contexto local
+    if (reportProvider.recentReports.isNotEmpty) {
+      center = LatLng(
+        reportProvider.recentReports.first.latitude,
+        reportProvider.recentReports.first.longitude,
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -154,27 +167,38 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppConfig.primaryBlue),
               ),
               const SizedBox(height: 16),
-              Container(
-                height: 200,
-                decoration: BoxDecoration(
+              SizedBox(
+                height: 250,
+                child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
-                  color: Colors.grey[200],
-                ),
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
+                  child: FlutterMap(
+                    options: MapOptions(
+                      initialCenter: center,
+                      initialZoom: 13.0,
+                      interactionOptions: const InteractionOptions(
+                        flags: InteractiveFlag.none,
+                      ),
                     ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.location_on, color: Colors.red, size: 16),
-                        SizedBox(width: 4),
-                        Text('2 Reportes en tu zona', style: TextStyle(fontWeight: FontWeight.bold)),
-                      ],
-                    ),
+                    children: [
+                      TileLayer(
+                        urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        userAgentPackageName: 'com.h2ochimal.app',
+                      ),
+                      MarkerLayer(
+                        markers: reportProvider.recentReports.map((report) {
+                          return Marker(
+                            point: LatLng(report.latitude, report.longitude),
+                            width: 40,
+                            height: 40,
+                            child: const Icon(
+                              Icons.location_on,
+                              color: Colors.red,
+                              size: 40,
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
                   ),
                 ),
               ),
