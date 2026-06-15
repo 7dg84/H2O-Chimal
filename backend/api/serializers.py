@@ -66,13 +66,20 @@ class RegisterSerializer(serializers.ModelSerializer):
         user = get_user_model().objects.create_user(**validated_data, password=password)
         return user
 
+class UpdateProfilerSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        write_only=True, min_length=8, required=False)
+
+    class Meta:
+        model = get_user_model()
+        fields = ['email', 'password', 'curp', 'name', 'phone',
+                  'postal_code', 'colonia', 'street', 'block', 'exterior_number']
+        read_only_fields = ['id', 'email', 'curp']
+        
     def update(self, instance, validated_data):
         # Required fields check
         phone = validated_data.get('phone')
         postal_code = validated_data.get('postal_code')
-        # Remove mail and curp to avoid update those fields
-        validated_data.pop('curp', None)
-        validated_data.pop('email', None)
 
         if not phone:
             raise serializers.ValidationError(

@@ -2,7 +2,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
 from .models import Report, Document, Service, Tramite, AuditLog, Media, DocumentType, ServiceRequirement
-from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UserSerializer, MediaSerializer, DocumentTypeSerializer, ServiceRequirementSerializer, ReportsCoordinatesSerializer, AuditLogSerializer
+from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UpdateProfilerSerializer, UserSerializer, MediaSerializer, DocumentTypeSerializer, ServiceRequirementSerializer, ReportsCoordinatesSerializer, AuditLogSerializer
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 from django.shortcuts import get_object_or_404
@@ -17,7 +17,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 class RegisterView(viewsets.GenericViewSet):
-    serializer_class = RegisterSerializer
+    # serializer_class = RegisterSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'register':
+            return RegisterSerializer
+        elif self.action == 'update_info':
+            return UpdateProfilerSerializer
+        return super().get_serializer_class()
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
     def register(self, request):
