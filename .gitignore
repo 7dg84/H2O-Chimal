@@ -1,6 +1,6 @@
 .env/*
 .envl/*
-.app/*
+# .app/*
 .env
 /backend/.env
 .vscode/*
