@@ -26,7 +26,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = ['email', 'password', 'curp', 'name', 'phone',
                   'postal_code', 'colonia', 'street', 'block', 'exterior_number']
-        read_only_fields = ['id', 'email', 'curp']
+        read_only_fields = ['id']
 
     def create(self, validated_data):
         # Required fields check
