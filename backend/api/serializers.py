@@ -70,6 +70,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         # Required fields check
         phone = validated_data.get('phone')
         postal_code = validated_data.get('postal_code')
+        # Remove mail and curp to avoid update those fields
+        validated_data.pop('curp', None)
+        validated_data.pop('email', None)
 
         if not phone:
             raise serializers.ValidationError(
