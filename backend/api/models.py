@@ -76,8 +76,8 @@ class ServiceRequirement(models.Model):
 
 
 class Report(models.Model):
-    REPORT_TYPES = [('superficial', 'superficial'), ('tuberia', 'tuberia'),
-                    ('domiciliaria', 'domiciliaria'), ('obstruido', 'obstruido')]
+    REPORT_TYPES = [('baja', 'baja'), ('media', 'media'),
+                    ('alta', 'alta'), ('extrema', 'extrema')]
     STATUS_CHOICES = [('Recibido', 'Recibido'), ('En revisión', 'En revisión'), (
         'En atención', 'En atención'), ('Resuelto', 'Resuelto'), ('Cerrado', 'Cerrado')]
 
