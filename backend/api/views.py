@@ -193,6 +193,13 @@ class MediaViewSet(viewsets.ModelViewSet):
         file = request.FILES.get('file')
         data = request.data.copy()
         if file:
+            # Validar que sea PDF o imagen
+            content_type = file.content_type or ''
+            is_image = content_type.startswith('image/') or file.name.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp'))
+            
+            if not (is_image):
+                return Response({'error': 'Solo se permiten imágenes (JPEG, PNG, GIF, WEBP).'}, status=status.HTTP_400_BAD_REQUEST)
+
             # save using default storage (S3/Ceph)
             key = self.storage.save(file.name, file)
             data['storage_key'] = key
@@ -212,6 +219,9 @@ class MediaViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
+        # Si el reporte ya fue recibido y no es admin, no eliminarlo
+        if instance.report.status != 'Recibido' and getattr(request.user, 'role', '') != 'admin':
+            return Response({'error': 'Only documents associated with a "Creado" status tramite can be deleted'}, status=status.HTTP_400_BAD_REQUEST)
         # delete from storage
         try:
             if instance.storage_key:
@@ -258,6 +268,14 @@ class DocumentViewSet(viewsets.ModelViewSet):
         file = request.FILES.get('file')
         data = request.data.copy()
         if file:
+            # Validar que sea PDF o imagen
+            content_type = file.content_type or ''
+            is_pdf = content_type == 'application/pdf' or file.name.lower().endswith('.pdf')
+            is_image = content_type.startswith('image/') or file.name.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp'))
+            
+            if not (is_pdf or is_image):
+                return Response({'error': 'Solo se permiten archivos PDF o imágenes (JPEG, PNG, GIF, WEBP).'}, status=status.HTTP_400_BAD_REQUEST)
+
             # save using default storage (S3/Ceph)
             key = self.storage.save(file.name, file)
             data['storage_key'] = key
@@ -277,6 +295,8 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
+        if instance.tramite.status != 'Creado' and getattr(request.user, 'role', '') != 'admin':
+            return Response({'error': 'Only documents associated with a "Creado" status tramite can be deleted'}, status=status.HTTP_400_BAD_REQUEST)
         # delete from storage
         try:
             if instance.storage_key:
