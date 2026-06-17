@@ -288,6 +288,36 @@ class DocumentSerializer(serializers.ModelSerializer):
         except Exception:
             return None
 
+    def validate(self, attrs):
+        tramite = attrs.get('tramite')
+        document_type = attrs.get('document_type')
+
+        if tramite and document_type:
+            # 1. Validar que el tipo de documento sea requerido/permitido para el servicio de este trámite
+            req_exists = ServiceRequirement.objects.filter(
+                service=tramite.service,
+                document_type=document_type
+            ).exists()
+            if not req_exists:
+                raise serializers.ValidationError(
+                    f"El tipo de documento '{document_type.name}' no está permitido/requerido para el trámite de tipo '{tramite.service.name}'."
+                )
+
+            # 2. Validar que no exista ya un documento de este tipo para este trámite
+            existing_docs = Document.objects.filter(
+                tramite=tramite,
+                document_type=document_type
+            )
+            if self.instance:
+                existing_docs = existing_docs.exclude(pk=self.instance.pk)
+
+            if existing_docs.exists():
+                raise serializers.ValidationError(
+                    f"Ya se ha subido un documento del tipo '{document_type.name}' para este trámite."
+                )
+
+        return attrs
+
     def create(self, validated_data):
         # Automatically associate the creating user with the Document
         request = self.context.get('request')
