@@ -99,7 +99,8 @@ class UpdateProfilerSerializer(serializers.ModelSerializer):
                 {'postal_code': 'Código postal inválido'})
 
         # Handle password if provided
-        password = validated_data.pop('password', None)
+        password = validated_data.get('password')
+        validated_data.pop('password', None)
 
         # Prevent changing email
         if 'email' in validated_data and validated_data['email'] != instance.email:
@@ -470,8 +471,34 @@ class ReviewSerilizer(serializers.ModelSerializer):
         return super().create(validated_data)
         
 class StaffSerilizer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        write_only=True, min_length=8, required=False)
+    
     class Meta:
         model = get_user_model()
-        fields = ['id', 'email', 'curp', 'name', 'phone', 'postal_code',
+        fields = ['id', 'email', 'password', 'curp', 'name', 'phone', 'postal_code',
                   'colonia', 'street', 'block', 'exterior_number', 'role']
         
+    def create(self, validated_data):
+        password = validated_data.pop('password', None)
+        if not password:
+            raise serializers.ValidationError(
+                {'password': 'Password requerido'})
+        # Use the custom manager to create the user (handles password properly)
+        user = get_user_model().objects.create_user(**validated_data, password=password)
+        return user
+    
+    def update(self, instance, validated_data):
+        # Handle password if provided
+        password = validated_data.get('password')
+        validated_data.pop('password', None)
+        
+        # Update simple fields on the instance
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        if password:
+            instance.set_password(password)
+
+        # instance.save()
+        return instance
