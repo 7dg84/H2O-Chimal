@@ -385,7 +385,7 @@ class TramiteSerializer(serializers.ModelSerializer):
 
     def get_documents(self, obj):
         docs_qs = Document.objects.filter(tramite=obj)
-        return [{"id": d.id, "filename": d.filename} for d in docs_qs]
+        return [{"id": d.id, "filename": d.filename, "name":d.document_type.name} for d in docs_qs]
 
 
 class DocumentTypeSerializer(serializers.ModelSerializer):
