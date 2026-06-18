@@ -1,6 +1,6 @@
 import django_filters
-from .models import Report, Service, Media, Tramite, Document, ServiceRequirement, AuditLog
-
+from .models import Report, Service, Media, Tramite, Document, ServiceRequirement, AuditLog, Review
+from django.contrib.auth import get_user_model
 
 class ServiceFilter(django_filters.FilterSet):
     class Meta:
@@ -86,4 +86,37 @@ class AuditLogFilter(django_filters.FilterSet):
         fields = {
             'user__email': ['icontains'],
             'action': ['icontains'],
+        }
+
+
+class ReviewFilter(django_filters.FilterSet):
+    class Meta:
+        model = Review
+        fields = {
+            'id': ['exact'],
+            'user': ['exact'],
+            'user__curp': ['icontains'],
+            'user__email': ['icontains'],
+            'report': ['exact'],
+            'tramite': ['exact'],
+            'value': ['exact', 'gte', 'lte', 'range'],
+            'created_at': ['exact', 'gte', 'lte', 'range'],
+        }
+
+
+class UserFilter(django_filters.FilterSet):
+    class Meta:
+        model = get_user_model()
+        fields = {
+            'id': ['exact'],
+            'email': ['icontains'],
+            'curp': ['icontains'],
+            'name': ['icontains'],
+            'phone': ['icontains'],
+            'postal_code': ['icontains'],
+            'colonia': ['icontains'],
+            'street': ['icontains'],
+            'block': ['icontains'],
+            'exterior_number': ['icontains'],
+            'role': ['icontains'],
         }

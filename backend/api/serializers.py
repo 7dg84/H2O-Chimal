@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Report, Document, Service, DocumentType, Tramite, Media, AuditLog
+from .models import User, Report, Document, Service, DocumentType, Tramite, Media, AuditLog, Review
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.core.files.storage import default_storage
@@ -413,3 +413,65 @@ class AuditLogSerializer(serializers.ModelSerializer):
         model = AuditLog
         fields = '__all__'
         read_only_fields = '__all__'
+
+class ReviewSerilizer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = '__all__'
+        read_only_fields = ['user']
+
+    def validate(self, attrs):
+        request = self.context.get('request')
+        user = getattr(request, 'user', None) if request else serializers.ValidationError("El usuario es necesario")
+
+        report = attrs.get('report')
+        tramite = attrs.get('tramite')
+
+        if self.instance:
+            if 'report' not in attrs:
+                report = self.instance.report
+            if 'tramite' not in attrs:
+                tramite = self.instance.tramite
+
+        # 1. Validate XOR check constraint
+        if not report and not tramite:
+            raise serializers.ValidationError("El registro debe tener un solo modelo")
+        if report and tramite:
+            raise serializers.ValidationError("El registro debe tener un solo modelo")
+
+        # 2. Validate that the report/tramite belongs to the authenticated user
+        if user and user.is_authenticated:
+            if report and report.user != user:
+                raise serializers.ValidationError("El reporte no pertenece al usuario autenticado.")
+            if tramite and tramite.user != user:
+                raise serializers.ValidationError("El trámite no pertenece al usuario autenticado.")
+            
+        # 3. Validate not if exist a review
+        if user:
+            # Si estamos editando (PUT/PATCH), excluimos el registro actual del conteo
+            review_id = self.instance.id if self.instance else None
+            
+            if report:
+                duplicate_exists = Review.objects.filter(user=user, report=report).exclude(id=review_id).exists()
+                if duplicate_exists:
+                    raise serializers.ValidationError({"report": "Ya has dejado una reseña para este reporte."})
+            
+            if tramite:
+                duplicate_exists = Review.objects.filter(user=user, tramite=tramite).exclude(id=review_id).exists()
+                if duplicate_exists:
+                    raise serializers.ValidationError({"tramite": "Ya has dejado una reseña para este trámite."})
+
+        return attrs
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            validated_data['user'] = request.user
+        return super().create(validated_data)
+        
+class StaffSerilizer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ['id', 'email', 'curp', 'name', 'phone', 'postal_code',
+                  'colonia', 'street', 'block', 'exterior_number', 'role']
+        

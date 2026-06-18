@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.db.models import Q, CheckConstraint, UniqueConstraint
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
 
@@ -166,3 +167,44 @@ class AuditLog(models.Model):
 
     def __str__(self):
         return f"{self.action} by {self.user} @ {self.created_at}"
+
+class Review(models.Model):
+    STARTS = [(1,1), (2,2), (3,3), (4,4), (5,5)]
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL)
+    report = models.ForeignKey(
+        Report, null=True, blank=True, on_delete=models.CASCADE)
+    tramite = models.ForeignKey(
+        Tramite, null=True, blank=True, on_delete=models.CASCADE)
+    value = models.IntegerField(choices=STARTS, null=False, blank=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        constraints = [
+             # 1. Asegura que tenga report o tramite, pero no ambos
+            CheckConstraint(
+                condition=(
+                    Q(report__isnull=False, tramite__isnull=True) |
+                    Q(report__isnull=True, tramite__isnull=False)
+                ),
+                name='review_debe_tener_un_solo_modelo'
+            ),
+            # 2. Unicidad: user + report (solo aplica si report no es nulo)
+            UniqueConstraint(
+                fields=['user', 'report'],
+                condition=Q(report__isnull=False, user__isnull=False),
+                name='unique_user_report_review'
+            ),
+            # 3. Unicidad: user + tramite (solo aplica si tramite no es nulo)
+            UniqueConstraint(
+                fields=['user', 'tramite'],
+                condition=Q(tramite__isnull=False, user__isnull=False),
+                name='unique_user_tramite_review'
+            )
+        ]
+
+    def __str__(self):
+        target = f"Report {self.report_id}" if self.report_id else f"Tramite {self.tramite_id}"
+        return f"Review {self.value}* by {self.user or 'Anonymous'} for {target}"

@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ReportViewSet, DocumentViewSet, ServiceViewSet, TramiteViewSet, RegisterView, MediaViewSet, DocumentTypeViewSet, RequirementViewSet, ReportCoordinateViewSet, AuditLogViewSet, login, logout, user_info
+from .views import ReportViewSet, DocumentViewSet, ServiceViewSet, TramiteViewSet, RegisterView, MediaViewSet, DocumentTypeViewSet, RequirementViewSet, ReportCoordinateViewSet, AuditLogViewSet, ReviewViewSet, UserViewSet, login, logout, user_info
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.schemas import get_schema_view
 
@@ -10,11 +10,13 @@ router.register(r'media', MediaViewSet, basename='media')
 router.register(r'documents', DocumentViewSet, basename='document')
 router.register(r'services', ServiceViewSet, basename='service')
 router.register(r'tramites', TramiteViewSet, basename='tramite')
+router.register(r'reviews', ReviewViewSet, basename='review')
 router.register(r'auth', RegisterView, basename='auth')
 router.register(r'document-types', DocumentTypeViewSet, basename='document-type')
 router.register(r'service-requirements', RequirementViewSet, basename='service-requirement')
 router.register(r'report-coordinates', ReportCoordinateViewSet, basename='report-coordinate')
 router.register(r'audit-logs', AuditLogViewSet, basename='audit-log')
+router.register(r'users', UserViewSet, basename='users')
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -23,5 +25,5 @@ urlpatterns = [
     path('auth/login/', login, name='login'),
     path('auth/logout/', logout, name='logout'),
     path('auth/user/', user_info, name='user_info'),
-    path('schema/', get_schema_view(title="H2O API Schema", description="API for H2O PEC6 project", version="1.0.0"), name='api-schema'),
+    path('schema/', get_schema_view(title="H2O API Schema", description="API for H2O Chimal project", version="1.5.1"), name='api-schema'),
 ]

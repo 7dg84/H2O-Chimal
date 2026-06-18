@@ -1,8 +1,8 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-from .models import Report, Document, Service, Tramite, AuditLog, Media, DocumentType, ServiceRequirement
-from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UpdateProfilerSerializer, UserSerializer, MediaSerializer, DocumentTypeSerializer, ServiceRequirementSerializer, ReportsCoordinatesSerializer, AuditLogSerializer
+from .models import Report, Document, Service, Tramite, AuditLog, Media, DocumentType, ServiceRequirement, Review
+from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UpdateProfilerSerializer, UserSerializer, MediaSerializer, DocumentTypeSerializer, ServiceRequirementSerializer, ReportsCoordinatesSerializer, AuditLogSerializer, ReviewSerilizer, StaffSerilizer
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 from django.shortcuts import get_object_or_404
@@ -12,7 +12,7 @@ from .auth import CookieTokenAuthentication
 from .permissions import IsOperator, IsAdmin, IsOperatorOrAdmin
 from h2o.storage_backends import MediaStorage, DocumentStorage
 from django.core.exceptions import ValidationError
-from .filters import ReportFilter, ServiceFilter, MediaFilter, TramiteFilter, DocumentFilter, ServiceRequirementFilter, ReportCoordinateFilter, AuditLogFilter
+from .filters import ReportFilter, ServiceFilter, MediaFilter, TramiteFilter, DocumentFilter, ServiceRequirementFilter, ReportCoordinateFilter, AuditLogFilter, ReviewFilter, UserFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
 
@@ -195,8 +195,9 @@ class MediaViewSet(viewsets.ModelViewSet):
         if file:
             # Validar que sea PDF o imagen
             content_type = file.content_type or ''
-            is_image = content_type.startswith('image/') or file.name.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp'))
-            
+            is_image = content_type.startswith(
+                'image/') or file.name.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp'))
+
             if not (is_image):
                 return Response({'error': 'Solo se permiten imágenes (JPEG, PNG, GIF, WEBP).'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -271,8 +272,9 @@ class DocumentViewSet(viewsets.ModelViewSet):
             # Validar que sea PDF o imagen
             content_type = file.content_type or ''
             is_pdf = content_type == 'application/pdf' or file.name.lower().endswith('.pdf')
-            is_image = content_type.startswith('image/') or file.name.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp'))
-            
+            is_image = content_type.startswith(
+                'image/') or file.name.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp'))
+
             if not (is_pdf or is_image):
                 return Response({'error': 'Solo se permiten archivos PDF o imágenes (JPEG, PNG, GIF, WEBP).'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -462,3 +464,51 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = AuditLogFilter
     search_fields = ['user__email', 'action', 'target_type', 'target_id']
     ordering_fields = ['created_at', 'action']
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all().order_by('-created_at')
+    serializer_class = ReviewSerilizer
+    permission_classes = [permissions.IsAuthenticated]
+
+    # Filters and search
+    filterset_class = ReviewFilter
+    search_fields = ['user__email', 'user__curp',
+                     'user__name', 'report__folio', 'tramite__folio']
+    ordering_fields = ['created_at', 'value']
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user = getattr(self.request, 'user', None)
+        # citizens see only their own reports,
+        if user and getattr(user, 'role', '') == 'citizen':
+            qs = qs.filter(user=user)
+        # operators see all by default
+        elif user and getattr(user, 'role', '') == 'admin':
+            qs = qs.all()
+        else:
+            qs = qs.none()
+        return qs
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        if self.action in ['list', 'create', 'retrieve', 'destroy']:
+            permission_classes = [permissions.IsAuthenticated]
+        elif self.action in ['update', 'partial_update']:
+            permission_classes = [IsAdmin]
+        else:
+            permission_classes = [IsAdmin]
+        return [permission() for permission in permission_classes]
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = get_user_model().objects.all().order_by('curp')
+    serializer_class = StaffSerilizer
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
+    # Filters and search
+    filterset_class = UserFilter
+    search_fields = ['email', 'curp', 'name', 'phone',]
+    ordering_fields = ['curp', 'name', 'email', 'phone']
