@@ -123,7 +123,7 @@ class UpdateProfilerSerializer(serializers.ModelSerializer):
         if password:
             instance.set_password(password)
 
-        # instance.save()
+        instance.save()
         return instance
 
 
@@ -500,5 +500,5 @@ class StaffSerilizer(serializers.ModelSerializer):
         if password:
             instance.set_password(password)
 
-        # instance.save()
+        instance.save()
         return instance
