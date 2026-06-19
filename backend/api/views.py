@@ -1,7 +1,7 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-from .models import Report, Document, Service, Tramite, AuditLog, Media, DocumentType, ServiceRequirement, Review
+from .models import Report, Document, Service, Tramite, AuditLog, Media, DocumentType, ServiceRequirement, Review, PasswordResetCode
 from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UpdateProfilerSerializer, UserSerializer, MediaSerializer, DocumentTypeSerializer, ServiceRequirementSerializer, ReportsCoordinatesSerializer, AuditLogSerializer, ReviewSerilizer, StaffSerilizer
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
@@ -45,6 +45,82 @@ class RegisterView(viewsets.GenericViewSet):
         serializer.is_valid(raise_exception=True)
         user = serializer.update(request.user, serializer.validated_data)
         return Response({'id': user.id, 'email': user.email}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny], url_path='password-reset')
+    def password_reset(self, request):
+        email = request.data.get('email')
+        if not email:
+            return Response({'error': 'El correo electrónico es requerido.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        User = get_user_model()
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            # Evitar enumeración de correos
+            return Response({'message': 'Si el correo está registrado, recibirás un código de verificación.'}, status=status.HTTP_200_OK)
+
+        import random
+        code = f"{random.randint(100000, 999999)}"
+
+        PasswordResetCode.objects.create(user=user, code=code)
+
+        import resend
+        import os
+        resend.api_key = os.environ.get("RESEND_API_KEY")
+        from_email = os.environ.get("RESEND_FROM_EMAIL", "onboarding@resend.dev")
+
+        try:
+            resend.Emails.send({
+                "from": from_email,
+                "to": email,
+                "subject": "Código de recuperación de contraseña - H2O Chimal",
+                "html": f"<p>Hola,</p><p>Has solicitado restablecer tu contraseña. Tu código de verificación es:</p><h2>{code}</h2><p>Este código expira en 15 minutos.</p><p>Si no solicitaste este cambio, puedes ignorar este correo.</p>"
+            })
+        except Exception as e:
+            # Registrar error en logs si se desea, por ahora continuamos para no interrumpir flujo local
+            pass
+
+        return Response({'message': 'Si el correo está registrado, recibirás un código de verificación.'}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny], url_path='password-reset-confirm')
+    def password_reset_confirm(self, request):
+        email = request.data.get('email')
+        code = request.data.get('code')
+        new_password = request.data.get('new_password')
+
+        if not email or not code or not new_password:
+            return Response({'error': 'Los campos email, code y new_password son requeridos.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        User = get_user_model()
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'error': 'Código o correo inválido.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        from datetime import timedelta
+        from django.utils import timezone
+
+        reset_code = PasswordResetCode.objects.filter(
+            user=user, code=code, is_used=False
+        ).order_by('-created_at').first()
+
+        if not reset_code:
+            return Response({'error': 'Código o correo inválido.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validar expiración (15 minutos)
+        expiry = reset_code.created_at + timedelta(minutes=15)
+        if timezone.now() > expiry:
+            return Response({'error': 'El código ha expirado.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Actualizar contraseña
+        user.set_password(new_password)
+        user.save()
+
+        # Marcar código como usado
+        reset_code.is_used = True
+        reset_code.save()
+
+        return Response({'message': 'Contraseña restablecida con éxito.'}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])

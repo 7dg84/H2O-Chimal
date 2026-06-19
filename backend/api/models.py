@@ -208,3 +208,14 @@ class Review(models.Model):
     def __str__(self):
         target = f"Report {self.report_id}" if self.report_id else f"Tramite {self.tramite_id}"
         return f"Review {self.value}* by {self.user or 'Anonymous'} for {target}"
+
+
+class PasswordResetCode(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Code for {self.user.email}: {self.code} (Used: {self.is_used})"
