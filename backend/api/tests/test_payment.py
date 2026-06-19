@@ -63,7 +63,7 @@ class PaymentFeatureTestCase(APITestCase):
         self.client.force_authenticate(user=self.admin_user)
         
         # 1. List config
-        response = self.client.get('/api/config/')
+        response = self.client.get('/api/payment/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Should have 2 entries (handles paginated and unpaginated)
         configs_list = response.data.get('results', response.data)
@@ -81,7 +81,7 @@ class PaymentFeatureTestCase(APITestCase):
             "requires_payment": True,
             "amount": "100.00"
         }
-        response = self.client.post('/api/config/', data, format='json')
+        response = self.client.post('/api/payment/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(ServicePaymentConfig.objects.filter(service=new_service).exists())
 
@@ -91,7 +91,8 @@ class PaymentFeatureTestCase(APITestCase):
             "requires_payment": True,
             "amount": "120.00"
         }
-        response = self.client.put(f'/api/config/{response.data["id"]}/', update_data, format='json')
+        url = f'/api/config/{response.data["id"]}/'
+        response = self.client.put(url, update_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(float(response.data['amount']), 120.00)
 
@@ -99,10 +100,10 @@ class PaymentFeatureTestCase(APITestCase):
         """Test that Citizen receives 403 Forbidden when trying to access /api/config/"""
         self.client.force_authenticate(user=self.citizen_user)
         
-        response = self.client.get('/api/config/')
+        response = self.client.get('/api/payment/')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         
-        response = self.client.post('/api/config/', {})
+        response = self.client.post('/api/payment/', {})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     @patch('api.signals.DocumentStorage.delete')

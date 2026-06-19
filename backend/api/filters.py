@@ -118,5 +118,5 @@ class UserFilter(django_filters.FilterSet):
             'street': ['icontains'],
             'block': ['icontains'],
             'exterior_number': ['icontains'],
-            'role': ['icontains'],
+            'role': ['exact'],
         }

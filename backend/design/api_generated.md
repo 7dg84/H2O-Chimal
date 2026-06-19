@@ -1,4 +1,4 @@
-# API generated on 2026-06-19T19:34:41.477014Z
+# API generated on 2026-06-19T21:37:50.215881Z
 
 ## 'api/auth/register/'
 Post:
