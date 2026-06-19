@@ -68,7 +68,7 @@ class RegisterView(viewsets.GenericViewSet):
         import resend
         import os
         resend.api_key = os.environ.get("RESEND_API_KEY")
-        from_email = os.environ.get("RESEND_FROM_EMAIL", "reset-password@h2ochimal.com")
+        from_email = os.environ.get("RESEND_FROM_EMAIL", "reset-password@mail.com")
 
         try:
             resend.Emails.send({

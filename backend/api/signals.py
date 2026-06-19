@@ -108,4 +108,16 @@ def handle_tramite_payment_document(sender, instance, created, **kwargs):
         mime_type="application/pdf",
         size=len(pdf_bytes)
     )
+    
+    # 6. Add a comment to notify the payment
+    new_note = 'Hemos adjuntado el pago correspondiente, pagalo y sube el comprobante.'
+    current_notes = instance.notes or ""
+    if current_notes:
+        updated_notes = f"{current_notes}\n{new_note}"
+    else:
+        updated_notes = new_note
+    
+    Tramite.objects.filter(pk=instance.id).update(notes=updated_notes)
+    instance.notes = updated_notes
+
 

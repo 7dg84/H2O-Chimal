@@ -17,7 +17,7 @@ router.register(r'service-requirements', RequirementViewSet, basename='service-r
 router.register(r'report-coordinates', ReportCoordinateViewSet, basename='report-coordinate')
 router.register(r'audit-logs', AuditLogViewSet, basename='audit-log')
 router.register(r'users', UserViewSet, basename='users')
-router.register(r'config', ServicePaymentConfigViewSet, basename='service-payment-config')
+router.register(r'payment', ServicePaymentConfigViewSet, basename='service-payment-config')
 
 
 urlpatterns = [

@@ -127,6 +127,10 @@ class PaymentFeatureTestCase(APITestCase):
         self.assertEqual(payment_doc.mime_type, "application/pdf")
         self.assertTrue(payment_doc.filename.startswith("pago_"))
         self.assertGreater(payment_doc.size, 0)
+
+        # Verify that the Tramite notes were updated
+        tramite.refresh_from_db()
+        self.assertIn('Hemos adjuntado el pago correspondiente, pagalo y sube el comprobante.', tramite.notes)
         
         # Clean up storage
         if payment_doc.storage_key:
