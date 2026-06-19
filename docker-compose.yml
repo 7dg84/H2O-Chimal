@@ -83,6 +83,17 @@ services:
     depends_on:
       - web
 
+  cloudflare-tunnel-media:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      TUNNEL_TOKEN: "${CLOUDFLARE_TUNNEL_TOKEN}"
+    networks:
+      - internal_net
+    depends_on:
+      - ceph
+
 volumes:
   db_data:
   ceph_data:
