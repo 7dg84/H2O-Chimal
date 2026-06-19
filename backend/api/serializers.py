@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Report, Document, Service, DocumentType, Tramite, Media, AuditLog, Review
+from .models import User, Report, Document, Service, DocumentType, Tramite, Media, AuditLog, Review, ServicePaymentConfig
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.core.files.storage import default_storage
@@ -502,3 +502,17 @@ class StaffSerilizer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class ServicePaymentConfigSerializer(serializers.ModelSerializer):
+    service_name = serializers.CharField(source='service.name', read_only=True)
+
+    class Meta:
+        model = ServicePaymentConfig
+        fields = ['id', 'service', 'service_name', 'requires_payment', 'amount']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance:
+            self.fields['service'].read_only = True
+

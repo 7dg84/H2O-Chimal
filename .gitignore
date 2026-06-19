@@ -4,3 +4,4 @@
 .env
 /backend/.env
 .vscode/*
+.docker-compose.yml

@@ -219,3 +219,13 @@ class PasswordResetCode(models.Model):
 
     def __str__(self):
         return f"Code for {self.user.email}: {self.code} (Used: {self.is_used})"
+
+
+class ServicePaymentConfig(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    service = models.OneToOneField(Service, on_delete=models.CASCADE, related_name='payment_config')
+    requires_payment = models.BooleanField(default=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"Payment Config for {self.service.name}: {self.amount}"

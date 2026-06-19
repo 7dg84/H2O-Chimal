@@ -1,9 +1,10 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-from .models import Report, Document, Service, Tramite, AuditLog, Media, DocumentType, ServiceRequirement, Review, PasswordResetCode
-from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UpdateProfilerSerializer, UserSerializer, MediaSerializer, DocumentTypeSerializer, ServiceRequirementSerializer, ReportsCoordinatesSerializer, AuditLogSerializer, ReviewSerilizer, StaffSerilizer
+from .models import Report, Document, Service, Tramite, AuditLog, Media, DocumentType, ServiceRequirement, Review, PasswordResetCode, ServicePaymentConfig
+from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UpdateProfilerSerializer, UserSerializer, MediaSerializer, DocumentTypeSerializer, ServiceRequirementSerializer, ReportsCoordinatesSerializer, AuditLogSerializer, ReviewSerilizer, StaffSerilizer, ServicePaymentConfigSerializer
 from django.contrib.auth import get_user_model
+
 from rest_framework.authtoken.models import Token
 from django.shortcuts import get_object_or_404
 from django.core.files.storage import default_storage
@@ -588,3 +589,12 @@ class UserViewSet(viewsets.ModelViewSet):
     filterset_class = UserFilter
     search_fields = ['email', 'curp', 'name', 'phone',]
     ordering_fields = ['curp', 'name', 'email', 'phone']
+
+
+class ServicePaymentConfigViewSet(viewsets.ModelViewSet):
+    queryset = ServicePaymentConfig.objects.all().order_by('service__name')
+    serializer_class = ServicePaymentConfigSerializer
+    permission_classes = [IsAdmin]
+    search_fields = ['service__name']
+    ordering_fields = ['service__name', 'requires_payment', 'amount']
+

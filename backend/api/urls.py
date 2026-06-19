@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ReportViewSet, DocumentViewSet, ServiceViewSet, TramiteViewSet, RegisterView, MediaViewSet, DocumentTypeViewSet, RequirementViewSet, ReportCoordinateViewSet, AuditLogViewSet, ReviewViewSet, UserViewSet, login, logout, user_info
+from .views import ReportViewSet, DocumentViewSet, ServiceViewSet, TramiteViewSet, RegisterView, MediaViewSet, DocumentTypeViewSet, RequirementViewSet, ReportCoordinateViewSet, AuditLogViewSet, ReviewViewSet, UserViewSet, ServicePaymentConfigViewSet, login, logout, user_info
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.schemas import get_schema_view
 
@@ -17,6 +17,8 @@ router.register(r'service-requirements', RequirementViewSet, basename='service-r
 router.register(r'report-coordinates', ReportCoordinateViewSet, basename='report-coordinate')
 router.register(r'audit-logs', AuditLogViewSet, basename='audit-log')
 router.register(r'users', UserViewSet, basename='users')
+router.register(r'config', ServicePaymentConfigViewSet, basename='service-payment-config')
+
 
 urlpatterns = [
     path('', include(router.urls)),

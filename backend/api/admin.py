@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Service, DocumentType, ServiceRequirement, Report, Document, Media, Tramite, AuditLog, Review
+from .models import User, Service, DocumentType, ServiceRequirement, Report, Document, Media, Tramite, AuditLog, Review, ServicePaymentConfig
 
 
 @admin.register(User)
@@ -25,3 +25,4 @@ admin.site.register(Media)
 admin.site.register(Tramite)
 admin.site.register(Review)
 admin.site.register(AuditLog)
+admin.site.register(ServicePaymentConfig)
