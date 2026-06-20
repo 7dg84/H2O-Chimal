@@ -101,8 +101,9 @@ class Report(models.Model):
     estimated_time_interval = models.CharField(max_length=200, blank=True)
 
     def save(self, *args, **kwargs):
-        last = Report.objects.order_by('-folio').first()
-        self.folio = (last.folio + 1) if last else 1
+        if not self.folio:
+            last = Report.objects.order_by('-folio').first()
+            self.folio = (last.folio + 1) if last else 1
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -130,8 +131,9 @@ class Tramite(models.Model):
     notes = models.TextField(blank=True)
 
     def save(self, *args, **kwargs):
-        last = Tramite.objects.order_by('-folio').first()
-        self.folio = (last.folio + 1) if last else 1
+        if not self.folio:
+            last = Tramite.objects.order_by('-folio').first()
+            self.folio = (last.folio + 1) if last else 1
         super().save(*args, **kwargs)
 
     def __str__(self):

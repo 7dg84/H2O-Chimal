@@ -2,7 +2,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
 from .models import Report, Document, Service, Tramite, AuditLog, Media, DocumentType, ServiceRequirement, Review, PasswordResetCode, ServicePaymentConfig
-from .serializers import ReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UpdateProfilerSerializer, UserSerializer, MediaSerializer, DocumentTypeSerializer, ServiceRequirementSerializer, ReportsCoordinatesSerializer, AuditLogSerializer, ReviewSerilizer, StaffSerilizer, ServicePaymentConfigSerializer
+from .serializers import ReportSerializer, AdminReportSerializer, DocumentSerializer, ServiceSerializer, TramiteSerializer, RegisterSerializer, UpdateProfilerSerializer, UserSerializer, MediaSerializer, DocumentTypeSerializer, ServiceRequirementSerializer, ReportsCoordinatesSerializer, AuditLogSerializer, ReviewSerilizer, StaffSerilizer, ServicePaymentConfigSerializer
 from django.contrib.auth import get_user_model
 
 from rest_framework.authtoken.models import Token
@@ -168,6 +168,12 @@ class ReportViewSet(viewsets.ModelViewSet):
     serializer_class = ReportSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_serializer_class(self):
+        user = getattr(self.request, 'user', None)
+        if user and getattr(user, 'role', '') == 'admin':
+            return AdminReportSerializer
+        return ReportSerializer
+
     # Filters and search
     filterset_class = ReportFilter
     search_fields = ['folio', 'description', 'location_text', 'user__curp']
@@ -198,14 +204,14 @@ class ReportViewSet(viewsets.ModelViewSet):
         report = self.get_object()
         operator_id = request.data.get('operator_id')
         if not operator_id or len(operator_id) != 36:
-            return Response({'error': 'operator_id required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'operator_id': 'operator_id required'}, status=status.HTTP_400_BAD_REQUEST)
         try:
             operator = get_object_or_404(
                 get_user_model(), id=operator_id, role='operator')
         except ValidationError:
-            return Response({'error': 'Invalid operator_id format'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'operator_id': 'Invalid operator_id format'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception:
-            return Response({'error': 'Operator not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'operator_id': 'Operator not found'}, status=status.HTTP_404_NOT_FOUND)
         report.assigned_operator_id = operator.id
         report.status = 'En atención'
         report.save()
@@ -234,22 +240,24 @@ class ReportViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         user = getattr(request, 'user', None)
-        if user and getattr(user, 'role', '') != 'admin':
+        is_admin = user and getattr(user, 'role', '') == 'admin'
+        if not is_admin:
             if self.get_object().status != 'Recibido':
                 return Response({'error': 'Only reports in "Recibido" status can be deleted'}, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                # Delete also media
-                media_qs = Media.objects.filter(report=self.get_object())
-                for media in media_qs:
-                    try:
-                        MediaStorage().delete(media.storage_key)
-                    except Exception:
-                        return Response({'error': 'Failed to delete media from storage'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-                    media.delete()
+        
+        # Delete also media
+        media_qs = Media.objects.filter(report=self.get_object())
+        for media in media_qs:
+            try:
+                MediaStorage().delete(media.storage_key)
+            except Exception:
+                return Response({'error': 'Failed to delete media from storage'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            media.delete()
         return super().destroy(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
-        if self.get_object().status != 'Recibido':
+        user = getattr(request, 'user', None)
+        if self.get_object().status != 'Recibido' and getattr(user, 'role', '') != 'admin':
             return Response({'error': 'Only reports in "Recibido" status can be updated'}, status=status.HTTP_400_BAD_REQUEST)
         return super().update(request, *args, **kwargs)
 

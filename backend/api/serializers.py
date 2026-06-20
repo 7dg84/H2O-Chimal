@@ -149,6 +149,19 @@ class ReportSerializer(serializers.ModelSerializer):
         return [str(m.id) for m in media_qs]
 
 
+class AdminReportSerializer(ReportSerializer):
+    class Meta(ReportSerializer.Meta):
+        read_only_fields = ['id', 'folio', 'reported_at']
+
+    def create(self, validated_data):
+        # Admins can optionally specify the user. Default to request.user if not specified.
+        if 'user' not in validated_data:
+            validated_data['user'] = self.context['request'].user
+        # Avoid calling ReportSerializer.create which pops user and notes.
+        # Call the parent of ReportSerializer (ModelSerializer) instead.
+        return super(ReportSerializer, self).create(validated_data)
+
+
 class AssignSerializer(serializers.Serializer):
     operator_id = serializers.UUIDField()
 

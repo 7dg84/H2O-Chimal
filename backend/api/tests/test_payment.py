@@ -59,7 +59,7 @@ class PaymentFeatureTestCase(APITestCase):
         self.client = APIClient()
 
     def test_admin_payment_config_crud(self):
-        """Test that Admin can manage payment configuration via CRUD endpoint /api/config/"""
+        """Test that Admin can manage payment configuration via CRUD endpoint /api/payment/"""
         self.client.force_authenticate(user=self.admin_user)
         
         # 1. List config
@@ -70,7 +70,7 @@ class PaymentFeatureTestCase(APITestCase):
         self.assertEqual(len(configs_list), 2)
 
         # 2. Retrieve config
-        response = self.client.get(f'/api/config/{self.payment_config.id}/')
+        response = self.client.get(f'/api/payment/{self.payment_config.id}/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(float(response.data['amount']), 250.50)
 
@@ -91,13 +91,13 @@ class PaymentFeatureTestCase(APITestCase):
             "requires_payment": True,
             "amount": "120.00"
         }
-        url = f'/api/config/{response.data["id"]}/'
+        url = f'/api/payment/{response.data["id"]}/'
         response = self.client.put(url, update_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(float(response.data['amount']), 120.00)
 
     def test_citizen_cannot_access_payment_config(self):
-        """Test that Citizen receives 403 Forbidden when trying to access /api/config/"""
+        """Test that Citizen receives 403 Forbidden when trying to access /api/payment/"""
         self.client.force_authenticate(user=self.citizen_user)
         
         response = self.client.get('/api/payment/')
