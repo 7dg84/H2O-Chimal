@@ -176,7 +176,7 @@ class ReportViewSet(viewsets.ModelViewSet):
 
     # Filters and search
     filterset_class = ReportFilter
-    search_fields = ['folio', 'description', 'location_text', 'user__curp']
+    search_fields = ['folio', 'description', 'location_text', 'user__id', 'user__curp']
     ordering_fields = ['reported_at', 'folio',
                        'status', 'estimared_time_interval']
 
