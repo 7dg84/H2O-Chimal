@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ['id', 'email', 'curp', 'name', 'phone', 'postal_code',
-                  'colonia', 'street', 'block', 'exterior_number']
+                  'colonia', 'street', 'block', 'exterior_number', 'role']
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -528,4 +528,4 @@ class ServicePaymentConfigSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
         if self.instance:
             self.fields['service'].read_only = True
-
+
