@@ -164,3 +164,54 @@ class PaymentFeatureTestCase(APITestCase):
         
         docs = Document.objects.filter(tramite=tramite)
         self.assertEqual(docs.count(), 0)
+
+    @patch('api.signals.DocumentStorage.delete')
+    @patch('api.signals.DocumentStorage.save')
+    def test_automatic_oficio_generation_on_receipt_upload(self, mock_save, mock_delete):
+        """Test that uploading a Document of type 'Comprobante de pago' updates the Tramite status and generates an 'Oficio' PDF"""
+        import uuid
+        mock_save.return_value = "dummy_oficio_key.pdf"
+        
+        # 1. Create a Tramite
+        tramite = Tramite.objects.create(
+            user=self.citizen_user,
+            service=self.service_paid,
+            status="Creado"
+        )
+        
+        # 2. Setup the DocumentType for Comprobante de Pago
+        COMPROBANTE_PAGO_ID = uuid.UUID('3911bbe8-45b7-4c72-9989-bd585d620d15')
+        comprobante_type, _ = DocumentType.objects.get_or_create(
+            id=COMPROBANTE_PAGO_ID,
+            defaults={
+                "name": "Comprobante de pago",
+                "description": "Comprobante de pago del trámite"
+            }
+        )
+        
+        # 3. Simulate uploading a Comprobante de pago Document
+        receipt_doc = Document.objects.create(
+            user=self.citizen_user,
+            tramite=tramite,
+            document_type=comprobante_type,
+            storage_key="receipt_key.pdf",
+            filename="receipt.pdf",
+            mime_type="application/pdf",
+            size=1234
+        )
+        
+        # 4. Verify Tramite status transitioned to "En tramite"
+        tramite.refresh_from_db()
+        self.assertEqual(tramite.status, "En tramite")
+        
+        # 5. Verify that a Document of type "Oficio" was generated automatically
+        OFICIO_ID = uuid.UUID('9c1a9967-2fa1-4963-a72a-acea41835404')
+        oficio_docs = Document.objects.filter(tramite=tramite, document_type_id=OFICIO_ID)
+        self.assertEqual(oficio_docs.count(), 1)
+        
+        oficio_doc = oficio_docs.first()
+        self.assertEqual(oficio_doc.document_type.name, "Oficio")
+        self.assertEqual(oficio_doc.mime_type, "application/pdf")
+        self.assertTrue(oficio_doc.filename.startswith("oficio_"))
+        self.assertGreater(oficio_doc.size, 0)
+

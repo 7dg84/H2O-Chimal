@@ -373,8 +373,8 @@ class ServiceSerializer(serializers.ModelSerializer):
 
 class TramiteSerializer(serializers.ModelSerializer):
     documents = serializers.SerializerMethodField(read_only=True)
-    service = serializers.PrimaryKeyRelatedField(
-        queryset=Service.objects.all(), required=True)
+    # service = serializers.PrimaryKeyRelatedField(
+    #     queryset=Service.objects.all(), required=True)
     service_name = serializers.CharField(source='service.name', read_only=True)
 
     class Meta:

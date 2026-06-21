@@ -6,7 +6,7 @@ from django.core.files.base import ContentFile
 import uuid
 
 from .models import Tramite, Document, DocumentType, ServicePaymentConfig
-from .utils_pdf import generate_payment_pdf
+from .utils_pdf import generate_payment_pdf, generate_oficio_pdf
 from h2o.storage_backends import DocumentStorage
 
 
@@ -119,5 +119,83 @@ def handle_tramite_payment_document(sender, instance, created, **kwargs):
     
     Tramite.objects.filter(pk=instance.id).update(notes=updated_notes)
     instance.notes = updated_notes
+
+
+@receiver(post_save, sender=Document)
+def handle_oficio_document_generation(sender, instance, created, **kwargs):
+    if not created:
+        return
+
+    # Document type UUIDs as specified by user
+    COMPROBANTE_PAGO_ID = uuid.UUID('3911bbe8-45b7-4c72-9989-bd585d620d15')
+    OFICIO_ID = uuid.UUID('9c1a9967-2fa1-4963-a72a-acea41835404')
+
+    # Get or create document types with the specified UUIDs
+    comprobante_type, _ = DocumentType.objects.get_or_create(
+        id=COMPROBANTE_PAGO_ID,
+        defaults={
+            "name": "Comprobante de pago",
+            "description": "Comprobante de pago del trámite"
+        }
+    )
+    oficio_type, _ = DocumentType.objects.get_or_create(
+        id=OFICIO_ID,
+        defaults={
+            "name": "Oficio",
+            "description": "Oficio de trámite"
+        }
+    )
+
+    # Check if the saved document is of type "Comprobante de pago"
+    if instance.document_type_id != COMPROBANTE_PAGO_ID:
+        return
+
+    tramite = instance.tramite
+    if not tramite:
+        return
+
+    # Update Tramite status to "En tramite"
+    Tramite.objects.filter(pk=tramite.id).update(status='En tramite')
+    tramite.status = 'En tramite'
+
+    # Check if an Oficio document already exists for this tramite to avoid duplicates
+    if Document.objects.filter(tramite=tramite, document_type_id=OFICIO_ID).exists():
+        return
+
+    # Generate the Oficio PDF
+    try:
+        pdf_bytes = generate_oficio_pdf(tramite)
+    except Exception:
+        return
+
+    # Save to storage
+    storage = DocumentStorage()
+    filename = f"oficio_{tramite.folio}_{uuid.uuid4().hex[:8]}.pdf"
+
+    try:
+        file_content = ContentFile(pdf_bytes)
+        storage_key = storage.save(filename, file_content)
+    except Exception:
+        return
+
+    # Create the Oficio Document instance
+    user = instance.user or tramite.user
+    if not user:
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        user = User.objects.filter(is_superuser=True).first() or User.objects.filter(role='admin').first()
+        if not user:
+            return
+
+    Document.objects.create(
+        user=user,
+        tramite=tramite,
+        document_type=oficio_type,
+        storage_key=storage_key,
+        filename=filename,
+        mime_type="application/pdf",
+        size=len(pdf_bytes)
+    )
+
 
 
